@@ -10,7 +10,6 @@ const projects = (await getSortedProjects()).slice(0, 4);
 
 <Layout
 	breadcrumbs={[{ label: 'noahjohnson.ai' }]}
-	showRightPanel={false}
 >
 	<WelcomeHero />
 	<SessionList heading="Recent Sessions" entries={posts} collection="posts" />

@@ -20,7 +20,6 @@ interface Props {
 	breadcrumbs: Crumb[];
 	rawMarkdown?: string;
 	rawFilename?: string;
-	showRightPanel?: boolean;
 }
 const {
 	title,
@@ -30,7 +29,6 @@ const {
 	breadcrumbs,
 	rawMarkdown,
 	rawFilename,
-	showRightPanel = false,
 } = Astro.props;
 
 // Recent items shown in the search overlay's default empty state.
@@ -44,7 +42,7 @@ const recentEntries = [...recentPosts, ...recentProjects];
 		<Sidebar />
 
 		<div class="main-col flex flex-1 min-w-0 flex-col relative">
-			<Topbar breadcrumbs={breadcrumbs} showRightPanel={showRightPanel} />
+			<Topbar breadcrumbs={breadcrumbs} />
 			<main
 				id="main"
 				class="flex-1 overflow-y-auto relative"
@@ -62,11 +60,7 @@ const recentEntries = [...recentPosts, ...recentProjects];
 			<SearchOverlay recentEntries={recentEntries} />
 		</div>
 
-		{
-			showRightPanel && (
-				<RightPanel rawMarkdown={rawMarkdown} filename={rawFilename} />
-			)
-		}
+		<RightPanel rawMarkdown={rawMarkdown} filename={rawFilename} />
 	</div>
 
 	<script>
@@ -109,24 +103,110 @@ const recentEntries = [...recentPosts, ...recentProjects];
 			const rpToggle = document.getElementById('rightpanel-toggle');
 			const rpClose = document.getElementById('rightpanel-close');
 
-			// Right panel: animate width 20rem ↔ 0 for smooth slide.
-			const setRPOpen = (open: boolean) => {
-				if (!rp) return;
-				rp.dataset.open = open ? '1' : '0';
-				(rp as HTMLElement).style.width = open ? '20rem' : '0';
-				(rp as HTMLElement).style.borderLeftWidth = open ? '1px' : '0';
+			// --- Right panel: persisted open/closed + resizable width ---
+			const RP_KEY = 'nj:rp';
+			const RP_DEFAULT_WIDTH = 320;
+			const RP_MIN = 240;
+			const RP_MAX = 600;
+
+			const getRPState = () => {
+				try {
+					const s = JSON.parse(localStorage.getItem(RP_KEY) || '{}');
+					return {
+						open:
+							typeof s.open === 'boolean'
+								? s.open
+								: window.matchMedia('(min-width: 1280px)').matches,
+						width:
+							typeof s.width === 'number' && s.width >= RP_MIN && s.width <= RP_MAX
+								? s.width
+								: RP_DEFAULT_WIDTH,
+					};
+				} catch {
+					return { open: false, width: RP_DEFAULT_WIDTH };
+				}
 			};
+			const saveRPState = (s: { open: boolean; width: number }) => {
+				localStorage.setItem(RP_KEY, JSON.stringify(s));
+			};
+			const applyRPState = (animate = true) => {
+				if (!rp) return;
+				const { open, width } = getRPState();
+				rp.dataset.open = open ? '1' : '0';
+				const rpEl = rp as HTMLElement;
+				const inner = document.getElementById('rightpanel-content') as HTMLElement | null;
+				if (!animate) rpEl.style.transition = 'none';
+				rpEl.style.width = open ? `${width}px` : '0px';
+				rpEl.style.borderLeftWidth = open ? '1px' : '0';
+				if (inner) inner.style.width = `${width}px`;
+				if (!animate) {
+					// Force reflow then re-enable transitions on next frame
+					void rpEl.offsetWidth;
+					requestAnimationFrame(() => {
+						rpEl.style.transition = '';
+					});
+				}
+			};
+
 			if (rp && !rp.dataset.rpInit) {
 				rp.dataset.rpInit = '1';
-				const isXL = window.matchMedia('(min-width: 1280px)').matches;
-				setRPOpen(isXL);
+				applyRPState(false);
 			}
+			// Always re-apply on page nav (persistent across navigations)
+			applyRPState(false);
+
 			const toggleRP = () => {
 				if (!rp) return;
-				setRPOpen(rp.dataset.open !== '1');
+				const s = getRPState();
+				saveRPState({ ...s, open: !s.open });
+				applyRPState(true);
 			};
 			if (rpToggle) (rpToggle as HTMLElement).onclick = toggleRP;
 			if (rpClose) (rpClose as HTMLElement).onclick = toggleRP;
+
+			// Resize handle
+			const rpResize = document.getElementById('rightpanel-resize');
+			if (rp && rpResize && !rpResize.dataset.rpResizeInit) {
+				rpResize.dataset.rpResizeInit = '1';
+				let dragging = false;
+				let startX = 0;
+				let startWidth = RP_DEFAULT_WIDTH;
+				const rpEl = rp as HTMLElement;
+				const resizeEl = rpResize as HTMLElement;
+
+				resizeEl.addEventListener('pointerdown', (e) => {
+					if (rp.dataset.open !== '1') return; // only resize when open
+					dragging = true;
+					startX = e.clientX;
+					startWidth = parseInt(rpEl.style.width, 10) || RP_DEFAULT_WIDTH;
+					resizeEl.setPointerCapture(e.pointerId);
+					rpEl.style.transition = 'none';
+					document.body.style.cursor = 'col-resize';
+					document.body.style.userSelect = 'none';
+				});
+				resizeEl.addEventListener('pointermove', (e) => {
+					if (!dragging) return;
+					// Panel is on the right edge — drag left grows, drag right shrinks
+					const dx = startX - e.clientX;
+					let w = startWidth + dx;
+					w = Math.max(RP_MIN, Math.min(RP_MAX, w));
+					rpEl.style.width = `${w}px`;
+					const inner = document.getElementById('rightpanel-content') as HTMLElement | null;
+					if (inner) inner.style.width = `${w}px`;
+				});
+				const endDrag = (e: PointerEvent) => {
+					if (!dragging) return;
+					dragging = false;
+					try { resizeEl.releasePointerCapture(e.pointerId); } catch {}
+					rpEl.style.transition = '';
+					document.body.style.cursor = '';
+					document.body.style.userSelect = '';
+					const w = parseInt(rpEl.style.width, 10) || RP_DEFAULT_WIDTH;
+					saveRPState({ open: true, width: w });
+				};
+				resizeEl.addEventListener('pointerup', endDrag);
+				resizeEl.addEventListener('pointercancel', endDrag);
+			}
 
 			// --- Search overlay ---
 			const overlay = document.getElementById('search-overlay');
