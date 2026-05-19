@@ -1,50 +1,26 @@
 ---
-// Mascot: clean iconic side-profile bike in Claude orange.
-// Monochrome — single color matching Claude's mascot palette discipline.
+// Mascot: the user's claude-bicycle-pixel_v5.png — Claude orange pixel bike.
+// Rendered with image-rendering:pixelated to preserve crisp pixel edges
+// at any display size. The cream background of the source PNG is preserved
+// (looks "right" against our warm-dark site bg). If we ever need a fully
+// transparent version, recolor the PNG offline.
+import { Image } from 'astro:assets';
+import bikeSrc from '../assets/bike.png';
+
 interface Props {
 	size?: number;
 	class?: string;
 }
-const { size = 80, class: className = '' } = Astro.props;
-
-const ORANGE = '#D97757';
+const { size = 96, class: className = '' } = Astro.props;
 ---
 
-<svg
-	xmlns="http://www.w3.org/2000/svg"
-	viewBox="0 0 64 40"
+<Image
+	src={bikeSrc}
+	alt=""
 	width={size}
-	height={size * 40 / 64}
-	fill="none"
-	stroke={ORANGE}
-	stroke-linecap="round"
-	stroke-linejoin="round"
-	aria-hidden="true"
+	height={size}
+	loading="lazy"
+	decoding="async"
+	style="image-rendering: pixelated; image-rendering: crisp-edges;"
 	class={className}
->
-	{/* Rear wheel */}
-	<circle cx="14" cy="30" r="8" stroke-width="2.5" />
-
-	{/* Front wheel */}
-	<circle cx="50" cy="30" r="8" stroke-width="2.5" />
-
-	{/* Frame — diamond */}
-	{/* Seat tube */}
-	<line x1="22" y1="10" x2="14" y2="30" stroke-width="2.5" />
-	{/* Top tube */}
-	<line x1="22" y1="10" x2="44" y2="10" stroke-width="2.5" />
-	{/* Head tube */}
-	<line x1="44" y1="10" x2="50" y2="30" stroke-width="2.5" />
-	{/* Down tube */}
-	<line x1="44" y1="10" x2="14" y2="30" stroke-width="2.5" />
-	{/* Chainstay */}
-	<line x1="22" y1="30" x2="14" y2="30" stroke-width="2.5" />
-
-	{/* Saddle */}
-	<line x1="22" y1="10" x2="22" y2="7" stroke-width="2" />
-	<line x1="18" y1="6" x2="26" y2="6" stroke-width="2" />
-
-	{/* Handlebar stem + bars */}
-	<line x1="50" y1="30" x2="50" y2="7" stroke-width="2.5" />
-	<line x1="47" y1="6" x2="53" y2="6" stroke-width="2" />
-</svg>
+/>
