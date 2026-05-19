@@ -53,8 +53,11 @@ const recentEntries = [...recentPosts, ...recentProjects];
 				<div class="max-w-3xl mx-auto px-4 sm:px-6 py-6">
 					<slot />
 				</div>
-				<Mascot size={80} class={`mascot fixed bottom-20 right-6 opacity-90 pointer-events-none select-none z-10`} />
 			</main>
+			<Mascot
+				size={84}
+				class="mascot absolute bottom-24 right-4 sm:right-6 opacity-90 pointer-events-none select-none z-10"
+			/>
 			<SearchBar />
 			<SearchOverlay recentEntries={recentEntries} />
 		</div>
@@ -235,6 +238,13 @@ const recentEntries = [...recentPosts, ...recentProjects];
 					}
 				});
 			}
+
+			// --- OS-aware keyboard shortcut label (⌘K vs Ctrl K) ---
+			const ua = navigator.userAgent;
+			const isMac = /Mac|iPhone|iPad|iPod/.test(ua) || /Mac/.test(navigator.platform);
+			document.querySelectorAll('[data-kbd-modifier]').forEach((el) => {
+				el.textContent = isMac ? '⌘K' : 'Ctrl K';
+			});
 
 			// --- Visited post tracking ---
 			const KEY = 'nj:visited';
