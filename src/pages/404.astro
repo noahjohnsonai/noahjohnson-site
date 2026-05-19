@@ -1,0 +1,27 @@
+---
+import Layout from '../layouts/Layout.astro';
+import Spark from '../components/Spark.astro';
+---
+
+<Layout
+	title="Session not found"
+	description="The session you're looking for doesn't exist."
+	breadcrumbs={[{ label: 'noahjohnson.ai', href: '/' }, { label: '404' }]}
+>
+	<div class="flex flex-col items-start gap-4 mt-12">
+		<div class="flex items-center gap-3">
+			<Spark size={28} class="text-accent" />
+			<h1 class="text-2xl sm:text-3xl font-semibold text-fg m-0">Session not found</h1>
+		</div>
+		<p class="text-fg-muted text-sm sm:text-base m-0 ml-10 max-w-md">
+			That session doesn't exist. It may have been moved, deleted, or never existed at all.
+		</p>
+		<a
+			href="/"
+			class="ml-10 mt-2 inline-flex items-center gap-2 text-sm text-accent hover:text-accent-soft no-underline"
+		>
+			<svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M11 7H3M6 4L3 7l3 3" /></svg>
+			<span>Back to recent sessions</span>
+		</a>
+	</div>
+</Layout>

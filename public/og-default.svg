@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630" width="1200" height="630">
+	<rect width="1200" height="630" fill="#1A1A1A"/>
+	<g transform="translate(80,80)">
+		<g fill="#D97757" transform="translate(0,8) scale(2.6)">
+			<path d="M12 1.5C12 6 12.5 10 12 11C13 10.5 17 11.5 22.5 12C17 12.5 13 13.5 12 13C12.5 14 12 18 12 22.5C12 18 11.5 14 12 13C11 13.5 7 12.5 1.5 12C7 11.5 11 10.5 12 11C11.5 10 12 6 12 1.5 Z"/>
+		</g>
+		<text x="100" y="60" fill="#E6E0D8" font-family="Geist, sans-serif" font-size="44" font-weight="500">noahjohnson.ai</text>
+	</g>
+	<text x="80" y="380" fill="#E6E0D8" font-family="Geist, sans-serif" font-size="72" font-weight="500">Noah Johnson</text>
+	<text x="80" y="450" fill="#9A9590" font-family="Geist, sans-serif" font-size="32">AI-augmented engineering,</text>
+	<text x="80" y="490" fill="#9A9590" font-family="Geist, sans-serif" font-size="32">methodology, and case studies.</text>
+	<rect x="80" y="540" width="40" height="2" fill="#D97757"/>
+</svg>

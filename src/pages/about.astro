@@ -1,0 +1,21 @@
+---
+import { getEntry, render } from 'astro:content';
+import PostLayout from '../layouts/PostLayout.astro';
+
+const entry = await getEntry('about', 'about');
+if (!entry) {
+	throw new Error('Missing about.md content at src/content/about/about.md');
+}
+const { Content } = await render(entry);
+---
+
+<PostLayout
+	title={entry.data.title ?? 'About'}
+	description={entry.data.description}
+	collectionLabel="About"
+	collectionHref="/about/"
+	rawMarkdown={entry.body ?? ''}
+	rawFilename="about.md"
+>
+	<Content />
+</PostLayout>
