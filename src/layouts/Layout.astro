@@ -6,6 +6,7 @@ import RightPanel from '../components/RightPanel.astro';
 import SearchBar from '../components/SearchBar.astro';
 import SearchOverlay from '../components/SearchOverlay.astro';
 import Mascot from '../components/Mascot.astro';
+import { getSortedPosts, getSortedProjects } from '../lib/data.ts';
 
 interface Crumb {
 	label: string;
@@ -31,13 +32,18 @@ const {
 	rawFilename,
 	showRightPanel = false,
 } = Astro.props;
+
+// Recent items shown in the search overlay's default empty state.
+const recentPosts = (await getSortedPosts()).slice(0, 4);
+const recentProjects = (await getSortedProjects()).slice(0, 2);
+const recentEntries = [...recentPosts, ...recentProjects];
 ---
 
 <BaseLayout title={title} description={description} image={image} type={type}>
 	<div class="shell flex h-svh w-full overflow-hidden">
 		<Sidebar />
 
-		<div class="main-col flex flex-1 min-w-0 flex-col">
+		<div class="main-col flex flex-1 min-w-0 flex-col relative">
 			<Topbar breadcrumbs={breadcrumbs} showRightPanel={showRightPanel} />
 			<main
 				id="main"
@@ -47,9 +53,10 @@ const {
 				<div class="max-w-3xl mx-auto px-4 sm:px-6 py-6">
 					<slot />
 				</div>
-				<Mascot size={56} class={`mascot fixed bottom-20 right-4 ${showRightPanel ? 'xl:right-[22rem]' : ''} opacity-90 pointer-events-none select-none z-10`} />
+				<Mascot size={80} class={`mascot fixed bottom-20 right-6 opacity-90 pointer-events-none select-none z-10`} />
 			</main>
 			<SearchBar />
+			<SearchOverlay recentEntries={recentEntries} />
 		</div>
 
 		{
@@ -59,12 +66,10 @@ const {
 		}
 	</div>
 
-	<SearchOverlay />
-
 	<script>
 		// ============================================================
 		// Sidebar drawer (mobile) + right panel toggle + search overlay
-		// + visited-post tracking. All vanilla JS, runs on every page nav.
+		// + visited-post tracking. Vanilla JS, runs on every page nav.
 		// ============================================================
 		function init() {
 			// --- Sidebar drawer ---
@@ -83,56 +88,84 @@ const {
 				backdrop.classList.add('opacity-0', 'pointer-events-none');
 				backdrop.classList.remove('opacity-100');
 			};
-			sidebarToggle?.addEventListener('click', openSidebar);
-			backdrop?.addEventListener('click', closeSidebar);
+			// Use onclick (replaces handler) instead of addEventListener
+			// to avoid double-binding on astro:page-load re-runs.
+			if (sidebarToggle) (sidebarToggle as HTMLElement).onclick = openSidebar;
+			if (backdrop) (backdrop as HTMLElement).onclick = closeSidebar;
 			// Close drawer on nav (sidebar links)
-			sidebar?.querySelectorAll('a').forEach((a) =>
-				a.addEventListener('click', () => {
+			sidebar?.querySelectorAll('a').forEach((a) => {
+				(a as HTMLElement).onclick = () => {
 					if (window.innerWidth < 1024) closeSidebar();
-				}),
-			);
+				};
+			});
 
 			// --- Right panel toggle ---
+			// Panel default: open if xl+ viewport, closed otherwise.
+			// transition:persist preserves panel state across navigations.
 			const rp = document.getElementById('rightpanel');
 			const rpToggle = document.getElementById('rightpanel-toggle');
 			const rpClose = document.getElementById('rightpanel-close');
+
+			if (rp && !rp.dataset.rpInit) {
+				rp.dataset.rpInit = '1';
+				const isXL = window.matchMedia('(min-width: 1280px)').matches;
+				if (isXL) {
+					rp.classList.remove('hidden');
+					rp.classList.add('flex');
+				}
+			}
+
 			const toggleRP = () => {
 				if (!rp) return;
 				rp.classList.toggle('hidden');
 				rp.classList.toggle('flex');
 			};
-			rpToggle?.addEventListener('click', toggleRP);
-			rpClose?.addEventListener('click', toggleRP);
+			if (rpToggle) (rpToggle as HTMLElement).onclick = toggleRP;
+			if (rpClose) (rpClose as HTMLElement).onclick = toggleRP;
 
 			// --- Search overlay ---
 			const overlay = document.getElementById('search-overlay');
 			const searchInput = document.getElementById('search-input') as HTMLInputElement | null;
 			const searchResults = document.getElementById('search-results');
+			const searchDefault = document.getElementById('search-default');
+			const searchLive = document.getElementById('search-live');
 			const triggers = [
 				document.getElementById('search-trigger'),
 				document.getElementById('searchbar-trigger'),
 			];
 			let pagefind: any = null;
 
+			const showDefault = () => {
+				if (searchDefault) searchDefault.classList.remove('hidden');
+				if (searchLive) {
+					searchLive.classList.add('hidden');
+					searchLive.innerHTML = '';
+				}
+			};
+			const showLive = (html: string) => {
+				if (searchDefault) searchDefault.classList.add('hidden');
+				if (searchLive) {
+					searchLive.classList.remove('hidden');
+					searchLive.innerHTML = html;
+				}
+			};
+
 			const openSearch = async () => {
 				if (!overlay) return;
 				overlay.classList.remove('hidden');
 				overlay.classList.add('flex');
 				overlay.setAttribute('aria-hidden', 'false');
+				showDefault();
 				setTimeout(() => searchInput?.focus(), 50);
 
 				if (!pagefind) {
 					try {
-						// Build URL at runtime so Vite can't statically analyze it.
-						// /pagefind/pagefind.js only exists after `pagefind --site dist` (postbuild).
 						const pf = '/pagefind/' + 'pagefind.js';
 						// @ts-ignore
 						pagefind = await import(/* @vite-ignore */ pf);
 						await pagefind.options({ baseUrl: '/' });
 					} catch (e) {
-						if (searchResults) {
-							searchResults.innerHTML = '<p class="text-fg-dim text-sm p-4 text-center">Search is only available in the production build.</p>';
-						}
+						// Dev mode: pagefind not built yet. Search will just show defaults.
 					}
 				}
 			};
@@ -142,22 +175,26 @@ const {
 				overlay.classList.remove('flex');
 				overlay.setAttribute('aria-hidden', 'true');
 				if (searchInput) searchInput.value = '';
-				if (searchResults) searchResults.innerHTML = '<p class="text-fg-dim text-sm p-4 text-center">Start typing to search.</p>';
+				showDefault();
 			};
-			triggers.forEach((t) => t?.addEventListener('click', openSearch));
-			document.getElementById('search-close')?.addEventListener('click', closeSearch);
-			overlay?.addEventListener('click', (e) => {
+			triggers.forEach((t) => { if (t) (t as HTMLElement).onclick = openSearch; });
+			const searchCloseBtn = document.getElementById('search-close');
+			if (searchCloseBtn) (searchCloseBtn as HTMLElement).onclick = closeSearch;
+			if (overlay) (overlay as HTMLElement).onclick = (e) => {
 				if (e.target === overlay) closeSearch();
-			});
+			};
 
-			// Search input → Pagefind
+			// Search input → Pagefind (or fallback)
 			let searchDebounce: number | undefined;
-			searchInput?.addEventListener('input', () => {
-				if (!pagefind) return;
+			if (searchInput) (searchInput as HTMLInputElement).oninput = () => {
 				clearTimeout(searchDebounce);
 				const q = searchInput.value.trim();
 				if (!q) {
-					if (searchResults) searchResults.innerHTML = '<p class="text-fg-dim text-sm p-4 text-center">Start typing to search.</p>';
+					showDefault();
+					return;
+				}
+				if (!pagefind) {
+					showLive('<p class="text-fg-dim text-sm p-4 text-center">Search is only available in the production build.</p>');
 					return;
 				}
 				searchDebounce = window.setTimeout(async () => {
@@ -165,33 +202,39 @@ const {
 					const items = await Promise.all(
 						search.results.slice(0, 10).map((r: any) => r.data()),
 					);
-					if (!searchResults) return;
 					if (items.length === 0) {
-						searchResults.innerHTML = '<p class="text-fg-dim text-sm p-4 text-center">No results.</p>';
+						showLive('<p class="text-fg-dim text-sm p-4 text-center">No results.</p>');
 						return;
 					}
-					searchResults.innerHTML = items
-						.map(
-							(d: any) => `
-								<a href="${d.url}" class="block px-4 py-3 rounded-md hover:bg-surface no-underline">
-									<div class="text-fg font-medium text-sm">${d.meta?.title ?? d.url}</div>
-									<div class="text-fg-muted text-xs mt-0.5 line-clamp-2">${d.excerpt}</div>
-								</a>
-							`,
-						)
-						.join('');
+					showLive(
+						items
+							.map(
+								(d: any) => `
+									<a href="${d.url}" class="block px-4 py-3 mx-1 rounded-md hover:bg-surface no-underline">
+										<div class="text-fg font-medium text-sm">${d.meta?.title ?? d.url}</div>
+										<div class="text-fg-muted text-xs mt-0.5 line-clamp-2">${d.excerpt}</div>
+									</a>
+								`,
+							)
+							.join(''),
+					);
 				}, 120);
-			});
+			};
 
-			// Keyboard shortcuts
-			document.addEventListener('keydown', (e) => {
-				if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'k') {
-					e.preventDefault();
-					openSearch();
-				} else if (e.key === 'Escape') {
-					closeSearch();
-				}
-			});
+			// Keyboard shortcuts (document-level — track once)
+			(document as any).__nj_keydown_bound = (document as any).__nj_keydown_bound || false;
+			if (!(document as any).__nj_keydown_bound) {
+				(document as any).__nj_keydown_bound = true;
+					document.addEventListener('keydown', (e) => {
+					if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'k') {
+						e.preventDefault();
+						// re-resolve overlay since it lives in DOM
+						document.getElementById('searchbar-trigger')?.click();
+					} else if (e.key === 'Escape') {
+						document.getElementById('search-close')?.click();
+					}
+				});
+			}
 
 			// --- Visited post tracking ---
 			const KEY = 'nj:visited';
