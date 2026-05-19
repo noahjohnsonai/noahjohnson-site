@@ -1,0 +1,85 @@
+---
+import Layout from './Layout.astro';
+import Prose from '../components/Prose.astro';
+import { formatAbsoluteDate } from '../lib/data.ts';
+
+interface Props {
+	title: string;
+	description?: string;
+	pubDate?: Date;
+	updatedDate?: Date;
+	tags?: string[];
+	collectionLabel: string; // "Posts" | "Projects" | "About"
+	collectionHref: string;  // "/posts" | "/projects" | "/about"
+	rawMarkdown: string;
+	rawFilename: string;
+}
+const {
+	title,
+	description,
+	pubDate,
+	updatedDate,
+	tags = [],
+	collectionLabel,
+	collectionHref,
+	rawMarkdown,
+	rawFilename,
+} = Astro.props;
+
+const breadcrumbs = [
+	{ label: 'noahjohnson.ai', href: '/' },
+	{ label: collectionLabel, href: collectionHref },
+	{ label: title },
+];
+---
+
+<Layout
+	title={title}
+	description={description}
+	type="article"
+	breadcrumbs={breadcrumbs}
+	rawMarkdown={rawMarkdown}
+	rawFilename={rawFilename}
+	showRightPanel={true}
+>
+	<article>
+		<header class="mb-8">
+			<h1 class="text-2xl sm:text-3xl font-semibold tracking-tight text-fg leading-tight m-0 mb-2">
+				{title}
+			</h1>
+			{description && (
+				<p class="text-fg-muted text-base m-0 mb-4">{description}</p>
+			)}
+			<div class="flex flex-wrap items-center gap-x-3 gap-y-2 text-xs text-fg-dim">
+				{pubDate && (
+					<time datetime={pubDate.toISOString()}>
+						{formatAbsoluteDate(pubDate)}
+					</time>
+				)}
+				{updatedDate && (
+					<>
+						<span>•</span>
+						<span>updated <time datetime={updatedDate.toISOString()}>{formatAbsoluteDate(updatedDate)}</time></span>
+					</>
+				)}
+				{tags.length > 0 && (
+					<>
+						<span>•</span>
+						<ul class="inline-flex flex-wrap gap-1.5 m-0 p-0 list-none">
+							{tags.map((t) => (
+								<li class="inline-block">
+									<span class="inline-block text-xs text-fg-muted font-mono px-1.5 py-0.5 rounded bg-surface border border-border-soft">
+										{t}
+									</span>
+								</li>
+							))}
+						</ul>
+					</>
+				)}
+			</div>
+		</header>
+		<Prose>
+			<slot />
+		</Prose>
+	</article>
+</Layout>

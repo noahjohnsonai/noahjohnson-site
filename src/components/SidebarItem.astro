@@ -1,0 +1,46 @@
+---
+// One sidebar "session" row. Shows status dot + title.
+// The status dot is hidden by default; JS in BaseLayout reveals it for unvisited posts (data-unvisited).
+interface Props {
+	href: string;
+	title: string;
+	slug: string; // used as the localStorage key for visited tracking
+	meta?: string; // optional right-aligned text (e.g., "2d")
+	active?: boolean; // current route
+	featured?: boolean;
+}
+const { href, title, slug, meta, active = false, featured = false } = Astro.props;
+---
+
+<li class="list-none">
+	<a
+		href={href}
+		data-slug={slug}
+		aria-current={active ? 'page' : undefined}
+		class:list={[
+			'flex items-center gap-2 px-3 py-1.5 mx-2 rounded-md text-sm no-underline transition-colors group',
+			active
+				? 'bg-surface text-fg'
+				: 'text-fg-muted hover:bg-surface hover:text-fg',
+		]}
+	>
+		<span
+			class="shrink-0 inline-block w-1.5 h-1.5 rounded-full bg-accent-soft opacity-0 transition-opacity"
+			data-unvisited-dot={slug}
+			aria-hidden="true"
+		></span>
+		<span class="truncate flex-1">{title}</span>
+		{
+			meta && (
+				<span class="shrink-0 text-xs text-fg-dim group-hover:text-fg-muted">
+					{meta}
+				</span>
+			)
+		}
+		{
+			featured && !meta && (
+				<span class="shrink-0 text-xs text-accent" aria-label="featured">★</span>
+			)
+		}
+	</a>
+</li>

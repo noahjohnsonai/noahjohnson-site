@@ -1,0 +1,16 @@
+---
+import { AUTHOR, SITE_DESCRIPTION } from '../consts.ts';
+import Spark from './Spark.astro';
+---
+
+<section class="welcome-hero px-2 sm:px-4 pt-8 pb-6">
+	<div class="flex items-center gap-3 mb-3">
+		<Spark size={28} class="text-accent shrink-0" />
+		<h1 class="text-2xl sm:text-3xl font-medium text-fg m-0 leading-tight">
+			Welcome back, {AUTHOR.split(' ')[0]}
+		</h1>
+	</div>
+	<p class="text-fg-muted text-sm sm:text-base m-0 ml-10 max-w-xl">
+		{SITE_DESCRIPTION}
+	</p>
+</section>

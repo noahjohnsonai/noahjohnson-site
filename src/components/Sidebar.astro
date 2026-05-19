@@ -1,0 +1,117 @@
+---
+import { getSortedPosts, getSortedProjects, groupByYear } from '../lib/data.ts';
+import SidebarGroup from './SidebarGroup.astro';
+import YearSubGroup from './YearSubGroup.astro';
+import SidebarItem from './SidebarItem.astro';
+import UserCard from './UserCard.astro';
+import Spark from './Spark.astro';
+
+const currentPath = Astro.url.pathname.replace(/\/$/, '') || '/';
+
+const posts = await getSortedPosts();
+const projects = await getSortedProjects();
+
+const postsByYear = groupByYear(posts);
+const projectsByYear = groupByYear(projects);
+
+const aboutActive = currentPath === '/about';
+---
+
+<aside
+	id="sidebar"
+	class="sidebar fixed lg:static inset-y-0 left-0 z-40 w-72 shrink-0 flex flex-col bg-bg border-r border-border-soft -translate-x-full lg:translate-x-0 transition-transform duration-200 ease-out"
+	transition:persist
+	aria-label="Site navigation"
+>
+	{/* Header — logo / site identity */}
+	<div class="flex items-center gap-2 px-5 py-4 border-b border-border-soft">
+		<Spark size={18} class="text-accent" />
+		<span class="text-sm font-medium text-fg truncate">noahjohnson.ai</span>
+	</div>
+
+	{/* Top utility nav */}
+	<div class="flex flex-col gap-0.5 px-2 py-2 border-b border-border-soft">
+		<a
+			href="/rss.xml"
+			class="flex items-center gap-2 px-3 py-1.5 rounded-md text-sm text-fg-muted hover:bg-surface hover:text-fg no-underline"
+		>
+			<svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 11a1 1 0 1 0 2 0 1 1 0 1 0-2 0M3 3a8 8 0 0 1 8 8M3 7a4 4 0 0 1 4 4" /></svg>
+			<span>+ New post</span>
+		</a>
+		<button
+			type="button"
+			id="search-trigger"
+			class="flex items-center gap-2 px-3 py-1.5 rounded-md text-sm text-fg-muted hover:bg-surface hover:text-fg text-left w-full bg-transparent border-0 cursor-pointer"
+		>
+			<svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 6a4 4 0 1 0 8 0 4 4 0 1 0-8 0M12 12l-3-3" /></svg>
+			<span class="flex-1">Search</span>
+			<kbd class="text-xs text-fg-dim border border-border rounded px-1 py-px font-mono">⌘K</kbd>
+		</button>
+	</div>
+
+	{/* Groups */}
+	<nav class="flex-1 overflow-y-auto py-2" aria-label="Posts and projects">
+		<SidebarGroup label="Posts" defaultOpen={true}>
+			{postsByYear.length === 0 ? (
+				<p class="text-xs text-fg-dim italic mx-5 my-2">No posts yet.</p>
+			) : (
+				postsByYear.map(({ year, entries }) => (
+					<YearSubGroup year={year} defaultOpen={true}>
+						{entries.map((entry) => (
+							<SidebarItem
+								href={`/posts/${entry.id}/`}
+								title={entry.data.title}
+								slug={`posts/${entry.id}`}
+								active={currentPath === `/posts/${entry.id}`}
+								featured={entry.data.featured}
+							/>
+						))}
+					</YearSubGroup>
+				))
+			)}
+		</SidebarGroup>
+
+		<SidebarGroup label="Projects" defaultOpen={true}>
+			{projectsByYear.length === 0 ? (
+				<p class="text-xs text-fg-dim italic mx-5 my-2">No projects yet.</p>
+			) : (
+				projectsByYear.map(({ year, entries }) => (
+					<YearSubGroup year={year} defaultOpen={true}>
+						{entries.map((entry) => (
+							<SidebarItem
+								href={`/projects/${entry.id}/`}
+								title={entry.data.title}
+								slug={`projects/${entry.id}`}
+								active={currentPath === `/projects/${entry.id}`}
+								featured={entry.data.featured}
+							/>
+						))}
+					</YearSubGroup>
+				))
+			)}
+		</SidebarGroup>
+
+		<SidebarGroup label="About" defaultOpen={true}>
+			<ul class="px-0">
+				<SidebarItem
+					href="/about/"
+					title="About"
+					slug="about"
+					active={aboutActive}
+				/>
+			</ul>
+		</SidebarGroup>
+	</nav>
+
+	{/* User card */}
+	<div class="border-t border-border-soft">
+		<UserCard />
+	</div>
+</aside>
+
+{/* Mobile drawer backdrop */}
+<div
+	id="sidebar-backdrop"
+	class="fixed inset-0 z-30 bg-black/60 opacity-0 pointer-events-none transition-opacity duration-200 lg:hidden"
+	aria-hidden="true"
+></div>

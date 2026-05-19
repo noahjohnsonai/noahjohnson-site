@@ -1,0 +1,54 @@
+---
+// Original pixel-art mascot. Position: fixed, bottom-right. Decorative.
+// 16x16 grid, scaled via size prop.
+interface Props {
+	size?: number;
+	class?: string;
+}
+const { size = 64, class: className = '' } = Astro.props;
+
+// Pixel matrix (16x16). 0 = transparent, 1 = body color (accent), 2 = darker outline, 3 = eyes
+const pixels = [
+	'0000001111110000',
+	'0000011111111000',
+	'0000111111111100',
+	'0001111111111110',
+	'0001112112112110',
+	'0001113113113110',
+	'0001113113113110',
+	'0001111111111110',
+	'0001111111111110',
+	'0001110111110110',
+	'0001110111110110',
+	'0001111111111110',
+	'0000111111111100',
+	'0000011111111000',
+	'0001100000001100',
+	'0001100000001100',
+];
+
+const colors: Record<string, string> = {
+	'0': 'transparent',
+	'1': '#D97757',
+	'2': '#8C4A36',
+	'3': '#1A1A1A',
+};
+---
+
+<svg
+	xmlns="http://www.w3.org/2000/svg"
+	viewBox="0 0 16 16"
+	width={size}
+	height={size}
+	shape-rendering="crispEdges"
+	aria-hidden="true"
+	class={className}
+>
+	{pixels.map((row, y) =>
+		row.split('').map((cell, x) =>
+			cell !== '0' ? (
+				<rect x={x} y={y} width="1" height="1" fill={colors[cell]} />
+			) : null,
+		),
+	)}
+</svg>

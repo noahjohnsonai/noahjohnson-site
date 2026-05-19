@@ -1,0 +1,216 @@
+---
+import BaseLayout from './BaseLayout.astro';
+import Sidebar from '../components/Sidebar.astro';
+import Topbar from '../components/Topbar.astro';
+import RightPanel from '../components/RightPanel.astro';
+import SearchBar from '../components/SearchBar.astro';
+import SearchOverlay from '../components/SearchOverlay.astro';
+import Mascot from '../components/Mascot.astro';
+
+interface Crumb {
+	label: string;
+	href?: string;
+}
+interface Props {
+	title?: string;
+	description?: string;
+	image?: string;
+	type?: 'website' | 'article';
+	breadcrumbs: Crumb[];
+	rawMarkdown?: string;
+	rawFilename?: string;
+	showRightPanel?: boolean;
+}
+const {
+	title,
+	description,
+	image,
+	type,
+	breadcrumbs,
+	rawMarkdown,
+	rawFilename,
+	showRightPanel = false,
+} = Astro.props;
+---
+
+<BaseLayout title={title} description={description} image={image} type={type}>
+	<div class="shell flex h-svh w-full overflow-hidden">
+		<Sidebar />
+
+		<div class="main-col flex flex-1 min-w-0 flex-col">
+			<Topbar breadcrumbs={breadcrumbs} showRightPanel={showRightPanel} />
+			<main
+				id="main"
+				class="flex-1 overflow-y-auto relative"
+				transition:animate="fade"
+			>
+				<div class="max-w-3xl mx-auto px-4 sm:px-6 py-6">
+					<slot />
+				</div>
+				<Mascot size={56} class="mascot fixed bottom-20 right-4 lg:right-[22rem] xl:right-[22rem] opacity-90 pointer-events-none select-none z-10" />
+			</main>
+			<SearchBar />
+		</div>
+
+		{
+			showRightPanel && (
+				<RightPanel rawMarkdown={rawMarkdown} filename={rawFilename} />
+			)
+		}
+	</div>
+
+	<SearchOverlay />
+
+	<script>
+		// ============================================================
+		// Sidebar drawer (mobile) + right panel toggle + search overlay
+		// + visited-post tracking. All vanilla JS, runs on every page nav.
+		// ============================================================
+		function init() {
+			// --- Sidebar drawer ---
+			const sidebar = document.getElementById('sidebar');
+			const backdrop = document.getElementById('sidebar-backdrop');
+			const sidebarToggle = document.getElementById('sidebar-toggle');
+			const openSidebar = () => {
+				if (!sidebar || !backdrop) return;
+				sidebar.classList.remove('-translate-x-full');
+				backdrop.classList.remove('opacity-0', 'pointer-events-none');
+				backdrop.classList.add('opacity-100');
+			};
+			const closeSidebar = () => {
+				if (!sidebar || !backdrop) return;
+				sidebar.classList.add('-translate-x-full');
+				backdrop.classList.add('opacity-0', 'pointer-events-none');
+				backdrop.classList.remove('opacity-100');
+			};
+			sidebarToggle?.addEventListener('click', openSidebar);
+			backdrop?.addEventListener('click', closeSidebar);
+			// Close drawer on nav (sidebar links)
+			sidebar?.querySelectorAll('a').forEach((a) =>
+				a.addEventListener('click', () => {
+					if (window.innerWidth < 1024) closeSidebar();
+				}),
+			);
+
+			// --- Right panel toggle ---
+			const rp = document.getElementById('rightpanel');
+			const rpToggle = document.getElementById('rightpanel-toggle');
+			const rpClose = document.getElementById('rightpanel-close');
+			const toggleRP = () => {
+				if (!rp) return;
+				rp.classList.toggle('hidden');
+				rp.classList.toggle('flex');
+			};
+			rpToggle?.addEventListener('click', toggleRP);
+			rpClose?.addEventListener('click', toggleRP);
+
+			// --- Search overlay ---
+			const overlay = document.getElementById('search-overlay');
+			const searchInput = document.getElementById('search-input') as HTMLInputElement | null;
+			const searchResults = document.getElementById('search-results');
+			const triggers = [
+				document.getElementById('search-trigger'),
+				document.getElementById('searchbar-trigger'),
+			];
+			let pagefind: any = null;
+
+			const openSearch = async () => {
+				if (!overlay) return;
+				overlay.classList.remove('hidden');
+				overlay.classList.add('flex');
+				overlay.setAttribute('aria-hidden', 'false');
+				setTimeout(() => searchInput?.focus(), 50);
+
+				if (!pagefind) {
+					try {
+						// @ts-ignore
+						pagefind = await import(/* @vite-ignore */ '/pagefind/pagefind.js');
+						await pagefind.options({ baseUrl: '/' });
+					} catch (e) {
+						if (searchResults) {
+							searchResults.innerHTML = '<p class="text-fg-dim text-sm p-4 text-center">Search index not built yet. Run a production build to enable search.</p>';
+						}
+					}
+				}
+			};
+			const closeSearch = () => {
+				if (!overlay) return;
+				overlay.classList.add('hidden');
+				overlay.classList.remove('flex');
+				overlay.setAttribute('aria-hidden', 'true');
+				if (searchInput) searchInput.value = '';
+				if (searchResults) searchResults.innerHTML = '<p class="text-fg-dim text-sm p-4 text-center">Start typing to search.</p>';
+			};
+			triggers.forEach((t) => t?.addEventListener('click', openSearch));
+			document.getElementById('search-close')?.addEventListener('click', closeSearch);
+			overlay?.addEventListener('click', (e) => {
+				if (e.target === overlay) closeSearch();
+			});
+
+			// Search input → Pagefind
+			let searchDebounce: number | undefined;
+			searchInput?.addEventListener('input', () => {
+				if (!pagefind) return;
+				clearTimeout(searchDebounce);
+				const q = searchInput.value.trim();
+				if (!q) {
+					if (searchResults) searchResults.innerHTML = '<p class="text-fg-dim text-sm p-4 text-center">Start typing to search.</p>';
+					return;
+				}
+				searchDebounce = window.setTimeout(async () => {
+					const search = await pagefind.search(q);
+					const items = await Promise.all(
+						search.results.slice(0, 10).map((r: any) => r.data()),
+					);
+					if (!searchResults) return;
+					if (items.length === 0) {
+						searchResults.innerHTML = '<p class="text-fg-dim text-sm p-4 text-center">No results.</p>';
+						return;
+					}
+					searchResults.innerHTML = items
+						.map(
+							(d: any) => `
+								<a href="${d.url}" class="block px-4 py-3 rounded-md hover:bg-surface no-underline">
+									<div class="text-fg font-medium text-sm">${d.meta?.title ?? d.url}</div>
+									<div class="text-fg-muted text-xs mt-0.5 line-clamp-2">${d.excerpt}</div>
+								</a>
+							`,
+						)
+						.join('');
+				}, 120);
+			});
+
+			// Keyboard shortcuts
+			document.addEventListener('keydown', (e) => {
+				if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'k') {
+					e.preventDefault();
+					openSearch();
+				} else if (e.key === 'Escape') {
+					closeSearch();
+				}
+			});
+
+			// --- Visited post tracking ---
+			const KEY = 'nj:visited';
+			const visited: Record<string, true> = JSON.parse(localStorage.getItem(KEY) ?? '{}');
+
+			// Reveal orange dot for posts NOT in visited
+			document.querySelectorAll('[data-unvisited-dot]').forEach((el) => {
+				const slug = el.getAttribute('data-unvisited-dot');
+				if (slug && !visited[slug]) {
+					(el as HTMLElement).style.opacity = '1';
+				}
+			});
+
+			// Mark current slug as visited if we're on a post/project/about page
+			const path = location.pathname.replace(/\/$/, '').replace(/^\//, '');
+			if (path && (path.startsWith('posts/') || path.startsWith('projects/') || path === 'about')) {
+				visited[path] = true;
+				localStorage.setItem(KEY, JSON.stringify(visited));
+			}
+		}
+
+		init();
+		document.addEventListener('astro:page-load', init);
+	</script>
+</BaseLayout>

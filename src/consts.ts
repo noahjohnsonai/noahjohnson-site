@@ -1,5 +1,11 @@
-// Place any global data in this file.
-// You can import this data from anywhere in your site by using the `import` keyword.
+// Site-wide identity. Used by BaseLayout, RSS, and components.
 
-export const SITE_TITLE = 'Astro Blog';
-export const SITE_DESCRIPTION = 'Welcome to my website!';
+export const SITE_TITLE = 'Noah Johnson';
+export const SITE_DESCRIPTION =
+	'AI-augmented engineering, methodology, and case studies.';
+export const SITE_URL = 'https://www.noahjohnson.ai/';
+export const AUTHOR = 'Noah Johnson';
+export const AUTHOR_INITIALS = 'NJ';
+export const AUTHOR_DOMAIN = 'noahjohnson.ai';
+export const AUTHOR_GITHUB = 'https://github.com/nojoatx';
+export const AUTHOR_EMAIL = 'noah.johnson00@gmail.com';

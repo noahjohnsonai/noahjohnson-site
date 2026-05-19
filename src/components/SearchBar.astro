@@ -1,0 +1,18 @@
+---
+// Bottom-of-main prompt-styled search input. Click or Cmd+K triggers SearchOverlay.
+---
+
+<div class="search-bar shrink-0 px-4 lg:px-6 pt-3 pb-4 bg-bg">
+	<button
+		type="button"
+		id="searchbar-trigger"
+		class="w-full flex items-center gap-3 px-4 py-3 rounded-xl border border-border bg-bg-elevated text-fg-muted hover:bg-surface hover:border-surface-hover transition-colors text-left text-sm cursor-pointer"
+		aria-label="Search posts"
+	>
+		<svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="shrink-0 text-fg-dim" aria-hidden="true">
+			<path d="M3 7a4 4 0 1 0 8 0 4 4 0 1 0-8 0M13 13l-3-3" />
+		</svg>
+		<span class="flex-1 text-fg-dim">Search posts or type / for commands</span>
+		<kbd class="hidden sm:inline-block text-xs text-fg-dim border border-border rounded px-1.5 py-px font-mono">⌘K</kbd>
+	</button>
+</div>

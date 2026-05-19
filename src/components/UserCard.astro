@@ -1,0 +1,20 @@
+---
+import { AUTHOR, AUTHOR_INITIALS, AUTHOR_DOMAIN } from '../consts.ts';
+---
+
+<a
+	href="/about/"
+	class="flex items-center gap-3 px-3 py-2.5 mx-2 my-2 rounded-lg border border-transparent hover:border-border hover:bg-surface transition-colors no-underline group"
+	aria-label="About Noah Johnson"
+>
+	<span
+		class="flex shrink-0 items-center justify-center w-9 h-9 rounded-full bg-accent text-bg font-medium text-sm select-none"
+		aria-hidden="true"
+	>
+		{AUTHOR_INITIALS}
+	</span>
+	<span class="flex flex-col min-w-0 leading-tight">
+		<span class="text-fg text-sm font-medium truncate">{AUTHOR}</span>
+		<span class="text-fg-muted text-xs truncate">{AUTHOR_DOMAIN}</span>
+	</span>
+</a>
