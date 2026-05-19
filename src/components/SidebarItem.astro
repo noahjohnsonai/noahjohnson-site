@@ -18,9 +18,9 @@ const { href, title, slug, meta, active = false, featured = false } = Astro.prop
 		data-slug={slug}
 		aria-current={active ? 'page' : undefined}
 		class:list={[
-			'flex items-center gap-2 px-3 py-1.5 mx-2 rounded-md text-sm no-underline transition-colors group',
+			'flex items-center gap-2 px-3 py-1.5 mx-2 rounded-md text-[14px] no-underline transition-colors group',
 			active
-				? 'bg-surface text-fg'
+				? 'bg-surface text-fg font-medium'
 				: 'text-fg-muted hover:bg-surface hover:text-fg',
 		]}
 	>

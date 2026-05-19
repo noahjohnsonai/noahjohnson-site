@@ -55,8 +55,8 @@ const recentEntries = [...recentPosts, ...recentProjects];
 				</div>
 			</main>
 			<Mascot
-				size={84}
-				class="mascot absolute bottom-24 right-4 sm:right-6 opacity-90 pointer-events-none select-none z-10"
+				size={72}
+				class="mascot absolute bottom-20 right-4 sm:right-6 opacity-90 pointer-events-none select-none z-10"
 			/>
 			<SearchBar />
 			<SearchOverlay recentEntries={recentEntries} />
@@ -109,19 +109,21 @@ const recentEntries = [...recentPosts, ...recentProjects];
 			const rpToggle = document.getElementById('rightpanel-toggle');
 			const rpClose = document.getElementById('rightpanel-close');
 
+			// Right panel: animate width 20rem ↔ 0 for smooth slide.
+			const setRPOpen = (open: boolean) => {
+				if (!rp) return;
+				rp.dataset.open = open ? '1' : '0';
+				(rp as HTMLElement).style.width = open ? '20rem' : '0';
+				(rp as HTMLElement).style.borderLeftWidth = open ? '1px' : '0';
+			};
 			if (rp && !rp.dataset.rpInit) {
 				rp.dataset.rpInit = '1';
 				const isXL = window.matchMedia('(min-width: 1280px)').matches;
-				if (isXL) {
-					rp.classList.remove('hidden');
-					rp.classList.add('flex');
-				}
+				setRPOpen(isXL);
 			}
-
 			const toggleRP = () => {
 				if (!rp) return;
-				rp.classList.toggle('hidden');
-				rp.classList.toggle('flex');
+				setRPOpen(rp.dataset.open !== '1');
 			};
 			if (rpToggle) (rpToggle as HTMLElement).onclick = toggleRP;
 			if (rpClose) (rpClose as HTMLElement).onclick = toggleRP;
