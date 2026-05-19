@@ -2,11 +2,11 @@ import { defineAstroPaperConfig } from "./src/types/config";
 
 export default defineAstroPaperConfig({
   site: {
-    url: "https://noahjohnson.ai/",
+    url: "https://www.noahjohnson.ai/",
     title: "Noah Johnson",
     description: "AI-augmented engineering, methodology, and case studies.",
     author: "Noah Johnson",
-    profile: "https://noahjohnson.ai/",
+    profile: "https://www.noahjohnson.ai/",
     ogImage: "default-og.jpg",
     lang: "en",
     timezone: "America/New_York",
