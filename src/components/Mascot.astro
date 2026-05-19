@@ -1,26 +1,28 @@
 ---
 // Mascot: the user's claude-bicycle-pixel_v5.png — Claude orange pixel bike.
-// Rendered with image-rendering:pixelated to preserve crisp pixel edges
-// at any display size. The cream background of the source PNG is preserved
-// (looks "right" against our warm-dark site bg). If we ever need a fully
-// transparent version, recolor the PNG offline.
+// Trimmed to tight bounds so it sits flush above the chat input bar.
 import { Image } from 'astro:assets';
 import bikeSrc from '../assets/bike.png';
 
 interface Props {
-	size?: number;
+	size?: number; // controls width; height scales to preserve aspect ratio
 	class?: string;
+	style?: string;
 }
-const { size = 96, class: className = '' } = Astro.props;
+const { size = 88, class: className = '', style = '' } = Astro.props;
+
+// bike.png is ~729x474 after trim → aspect ~1.538
+const ASPECT = 729 / 474;
+const height = Math.round(size / ASPECT);
 ---
 
 <Image
 	src={bikeSrc}
 	alt=""
 	width={size}
-	height={size}
+	height={height}
 	loading="lazy"
 	decoding="async"
-	style="image-rendering: pixelated; image-rendering: crisp-edges;"
+	style={`image-rendering: pixelated; image-rendering: crisp-edges; ${style}`}
 	class={className}
 />
