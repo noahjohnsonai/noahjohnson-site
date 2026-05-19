@@ -47,7 +47,7 @@ const {
 				<div class="max-w-3xl mx-auto px-4 sm:px-6 py-6">
 					<slot />
 				</div>
-				<Mascot size={56} class="mascot fixed bottom-20 right-4 lg:right-[22rem] xl:right-[22rem] opacity-90 pointer-events-none select-none z-10" />
+				<Mascot size={56} class={`mascot fixed bottom-20 right-4 ${showRightPanel ? 'xl:right-[22rem]' : ''} opacity-90 pointer-events-none select-none z-10`} />
 			</main>
 			<SearchBar />
 		</div>
@@ -123,12 +123,15 @@ const {
 
 				if (!pagefind) {
 					try {
+						// Build URL at runtime so Vite can't statically analyze it.
+						// /pagefind/pagefind.js only exists after `pagefind --site dist` (postbuild).
+						const pf = '/pagefind/' + 'pagefind.js';
 						// @ts-ignore
-						pagefind = await import(/* @vite-ignore */ '/pagefind/pagefind.js');
+						pagefind = await import(/* @vite-ignore */ pf);
 						await pagefind.options({ baseUrl: '/' });
 					} catch (e) {
 						if (searchResults) {
-							searchResults.innerHTML = '<p class="text-fg-dim text-sm p-4 text-center">Search index not built yet. Run a production build to enable search.</p>';
+							searchResults.innerHTML = '<p class="text-fg-dim text-sm p-4 text-center">Search is only available in the production build.</p>';
 						}
 					}
 				}

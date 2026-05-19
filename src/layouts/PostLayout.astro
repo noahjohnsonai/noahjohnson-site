@@ -26,11 +26,14 @@ const {
 	rawFilename,
 } = Astro.props;
 
-const breadcrumbs = [
-	{ label: 'noahjohnson.ai', href: '/' },
-	{ label: collectionLabel, href: collectionHref },
-	{ label: title },
-];
+const breadcrumbs =
+	collectionLabel === title
+		? [{ label: 'noahjohnson.ai', href: '/' }, { label: title }]
+		: [
+				{ label: 'noahjohnson.ai', href: '/' },
+				{ label: collectionLabel, href: collectionHref },
+				{ label: title },
+			];
 ---
 
 <Layout
