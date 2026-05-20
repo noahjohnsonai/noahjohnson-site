@@ -112,23 +112,62 @@
 		// Position the timeline in the gutter between the sidebar and the
 		// article. Compute target as article-left - 28, clamp so the
 		// timeline never overlaps the sidebar's right edge.
+		//
+		// Validation: during view-transitions and mid-animation reflows
+		// the article and sidebar can briefly report rect.width=0 (not
+		// rendered) or rect.left=0 (off-screen). Applying a position from
+		// those bogus rects pins the timeline to the wrong place. Skip
+		// any update where the measurements don't look sane.
+		let posRaf = 0;
 		const positionTimeline = () => {
+			posRaf = 0;
 			const rect = (article as HTMLElement)?.getBoundingClientRect();
 			if (!rect) return;
 			const sidebar = document.getElementById('sidebar');
-			const sbRight = sidebar?.getBoundingClientRect().right ?? 0;
+			const sbRect = sidebar?.getBoundingClientRect();
+			// Article must have real width and a positive left position;
+			// sidebar must have its expected right edge. Otherwise the
+			// page is mid-transition and the rect is unreliable.
+			if (!rect.width || rect.left <= 0) return;
+			if (!sbRect || !sbRect.width || sbRect.right <= 0) return;
 			const target = rect.left - 28;
-			const left = Math.max(sbRight + 4, target);
+			const left = Math.max(sbRect.right + 4, target);
 			root.style.left = `${left}px`;
+		};
+		// rAF-coalesce: ResizeObserver and resize can fire bursts during
+		// drag / animation. Schedule at most one positionTimeline per frame.
+		const schedulePosition = () => {
+			if (posRaf) return;
+			posRaf = requestAnimationFrame(positionTimeline);
 		};
 		positionTimeline();
 		const onResize = () => {
-			positionTimeline();
+			schedulePosition();
 			repositionTicks();
 		};
 		if ((window as any).__sp_resize) window.removeEventListener('resize', (window as any).__sp_resize);
 		(window as any).__sp_resize = onResize;
 		window.addEventListener('resize', onResize);
+
+		// Watch the article element directly. Window-resize alone doesn't
+		// catch right-drawer resize or any other DOM-driven layout shift
+		// that moves the article horizontally. ResizeObserver fires on
+		// every size change, regardless of cause. Coalesced via rAF so
+		// rapid bursts during drag don't thrash the timeline position.
+		const prevObs = (window as any).__sp_observer as ResizeObserver | undefined;
+		if (prevObs) prevObs.disconnect();
+		const obs = new ResizeObserver(() => {
+			schedulePosition();
+			repositionTicks();
+		});
+		obs.observe(article as Element);
+		// Also observe the right panel — its size changes don't always
+		// reflow the article (article x is anchored to content-col left),
+		// but the user-perceived "drawer moved" event should still trigger
+		// a re-measure in case the layout shifts in non-obvious ways.
+		const rightPanel = document.getElementById('rightpanel');
+		if (rightPanel) obs.observe(rightPanel);
+		(window as any).__sp_observer = obs;
 
 		// Give each heading a stable id we can scroll to.
 		headings.forEach((h, i) => {
