@@ -70,24 +70,6 @@ const aboutActive = currentPath === '/about';
 			)}
 		</SidebarGroup>
 
-		<SidebarGroup label="Projects" defaultOpen={true}>
-			{projects.length === 0 ? (
-				<p class="text-xs text-fg-dim italic mx-5 my-2">No projects yet.</p>
-			) : (
-				<ul class="px-0">
-					{projects.map((entry) => (
-						<SidebarItem
-							href={`/projects/${entry.id}/`}
-							title={entry.data.title}
-							slug={`projects/${entry.id}`}
-							active={currentPath === `/projects/${entry.id}`}
-							featured={entry.data.featured}
-						/>
-					))}
-				</ul>
-			)}
-		</SidebarGroup>
-
 		<SidebarGroup label="Case Studies" defaultOpen={true}>
 			{caseStudies.length === 0 ? (
 				<p class="text-xs text-fg-dim italic mx-5 my-2">No case studies yet.</p>
@@ -99,6 +81,24 @@ const aboutActive = currentPath === '/about';
 							title={entry.data.title}
 							slug={`case-studies/${entry.id}`}
 							active={currentPath === `/case-studies/${entry.id}`}
+							featured={entry.data.featured}
+						/>
+					))}
+				</ul>
+			)}
+		</SidebarGroup>
+
+		<SidebarGroup label="Projects" defaultOpen={true}>
+			{projects.length === 0 ? (
+				<p class="text-xs text-fg-dim italic mx-5 my-2">No projects yet.</p>
+			) : (
+				<ul class="px-0">
+					{projects.map((entry) => (
+						<SidebarItem
+							href={`/projects/${entry.id}/`}
+							title={entry.data.title}
+							slug={`projects/${entry.id}`}
+							active={currentPath === `/projects/${entry.id}`}
 							featured={entry.data.featured}
 						/>
 					))}
