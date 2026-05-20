@@ -12,6 +12,8 @@ tags:
   - case-study
 ---
 
+![Editorial illustration of a vintage typewriter on a wooden desk, three-quarter view, one terracotta-accented key on the keyboard, blank paper rolled into the carriage, warm dark background with soft directional light from upper left.](/case-studies/writing-harness-cover.jpg)
+
 The site you're reading runs on a writing harness I built on top of Claude Code. It's a small system of slash commands, two purpose-built agents, a voice scaffold that calibrates against my own prose, and a handful of conventions that govern how articles and case studies get drafted. The goal was modest. I wanted a writing tool that felt the same as the tool I was writing with, and I wanted that tool to produce prose that sounded like me instead of like an AI. What follows is the story of why the obvious approach to that second goal turned out to be wrong, and what we built instead.
 
 ## The default writing motion is wrong
