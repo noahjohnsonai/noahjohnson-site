@@ -41,25 +41,21 @@ const recentEntries = [...recentPosts, ...recentProjects];
 	<div class="shell flex h-dvh w-full overflow-hidden">
 		<Sidebar />
 
-		<div
-			class="main-col grid flex-1 min-w-0 relative"
-			style="grid-template-rows: auto 1fr auto 1fr;"
-		>
+		<div class="main-col flex flex-1 min-w-0 flex-col relative">
 			<Topbar breadcrumbs={breadcrumbs} />
 			<main
 				id="main"
-				class="overflow-y-auto relative min-h-0"
+				class="flex-1 overflow-y-auto relative"
 				transition:animate="fade"
 			>
 				<div class="content-col py-6">
 					<slot />
 				</div>
 			</main>
-			{/* Mascot anchored to the right edge of the centered content column,
-			    sitting just above the vertically-centered search bar */}
+			{/* Mascot anchored to the right edge of the centered content column */}
 			<div
-				class="mascot-anchor pointer-events-none"
-				style="grid-row: 2 / 3; align-self: end; justify-self: stretch;"
+				class="mascot-anchor absolute inset-x-0 pointer-events-none"
+				style="bottom: 6.25rem"
 			>
 				<div class="content-col relative">
 					<Mascot
