@@ -38,7 +38,7 @@ const recentEntries = [...recentPosts, ...recentProjects];
 ---
 
 <BaseLayout title={title} description={description} image={image} type={type}>
-	<div class="shell flex h-svh w-full overflow-hidden">
+	<div class="shell flex h-dvh w-full overflow-hidden">
 		<Sidebar />
 
 		<div class="main-col flex flex-1 min-w-0 flex-col relative">
@@ -53,8 +53,8 @@ const recentEntries = [...recentPosts, ...recentProjects];
 				</div>
 			</main>
 			<Mascot
-				size={88}
-				class="mascot hidden sm:block absolute right-4 sm:right-6 opacity-90 pointer-events-none select-none z-10"
+				size={72}
+				class="mascot absolute right-3 sm:right-6 opacity-90 pointer-events-none select-none z-10 sm:!w-[88px] sm:!h-[57px]"
 				style="bottom: 6.25rem"
 			/>
 			<SearchBar />

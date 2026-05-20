@@ -18,7 +18,7 @@ const { title, description, image, type } = Astro.props;
 		<BaseHead title={title} description={description} image={image} type={type} />
 		<ClientRouter />
 	</head>
-	<body class="font-sans antialiased text-fg bg-bg min-h-svh">
+	<body class="font-sans antialiased text-fg bg-bg h-dvh overflow-hidden">
 		<slot />
 	</body>
 </html>
