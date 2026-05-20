@@ -2,10 +2,15 @@
 import type { CollectionEntry } from 'astro:content';
 import { formatRelativeDate } from '../lib/data.ts';
 
+type SessionEntry =
+	| CollectionEntry<'posts'>
+	| CollectionEntry<'projects'>
+	| CollectionEntry<'caseStudies'>;
+
 interface Props {
 	heading?: string;
-	entries: (CollectionEntry<'posts'> | CollectionEntry<'projects'>)[];
-	collection: 'posts' | 'projects';
+	entries: SessionEntry[];
+	collection: 'posts' | 'projects' | 'case-studies';
 }
 const { heading = 'Sessions', entries, collection } = Astro.props;
 ---

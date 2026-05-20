@@ -1,0 +1,28 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import SessionList from '../../components/SessionList.astro';
+import { getSortedCaseStudies, assertCaseStudyInvariants } from '../../lib/data.ts';
+
+await assertCaseStudyInvariants();
+const entries = await getSortedCaseStudies();
+---
+
+<Layout
+	title="Case Studies"
+	description="Long-form practitioner write-ups of projects on noahjohnson.ai."
+	breadcrumbs={[{ label: 'noahjohnson.ai', href: '/' }, { label: 'Case Studies' }]}
+>
+	<header class="mb-6 px-2 sm:px-4">
+		<h1 class="text-2xl sm:text-3xl font-semibold tracking-tight text-fg leading-tight m-0 mb-2">
+			Case Studies
+		</h1>
+		<p class="text-fg-muted text-base m-0">
+			Long-form write-ups paired 1:1 with projects. Tension, investigation, resolution, and take-home artifacts.
+		</p>
+	</header>
+	{entries.length === 0 ? (
+		<p class="text-sm text-fg-dim italic px-5 py-6">No case studies yet.</p>
+	) : (
+		<SessionList heading="All Case Studies" entries={entries} collection="case-studies" />
+	)}
+</Layout>
