@@ -43,7 +43,7 @@ It also became the first real test of a workflow I want to write about: pair-pro
 
 ## Source
 
-[github.com/nojoatx/noahjohnson-site](https://github.com/nojoatx/noahjohnson-site) — MIT.
+[github.com/noahjohnsonai/noahjohnson-site](https://github.com/noahjohnsonai/noahjohnson-site) — MIT.
 
 ## Case study coming
 

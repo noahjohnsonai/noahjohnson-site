@@ -94,7 +94,10 @@ button, a {
 	max-width: 48rem; /* 768px, mobile baseline */
 	margin-left: auto;
 	margin-right: auto;
+	padding-left: 1rem;
+	padding-right: 1rem;
 }
+@media (min-width: 640px) { .content-col { padding-left: 1.5rem; padding-right: 1.5rem; } }
 @media (min-width: 1280px) { .content-col { max-width: 64rem; } }  /* xl */
 @media (min-width: 1536px) { .content-col { max-width: 72rem; } }  /* 2xl */
 @media (min-width: 1920px) { .content-col { max-width: 80rem; } }  /* 3xl */
