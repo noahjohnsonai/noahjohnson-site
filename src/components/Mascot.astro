@@ -11,8 +11,8 @@ interface Props {
 }
 const { size = 88, class: className = '', style = '' } = Astro.props;
 
-// bike.png is ~729x474 after trim → aspect ~1.538
-const ASPECT = 729 / 474;
+// bike.png is 802x541 after trim → aspect ~1.483
+const ASPECT = 802 / 541;
 const height = Math.round(size / ASPECT);
 ---
 
