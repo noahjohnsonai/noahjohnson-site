@@ -48,14 +48,10 @@ const skillRows = [
 	<Content />
 	<section slot="after" class="mt-10" aria-labelledby="skills-heading">
 		<h2 id="skills-heading" class="text-xl font-semibold tracking-tight text-fg m-0 mb-1">Skills</h2>
-		<p class="text-fg-muted text-sm m-0">It's not just skills, but also tools:</p>
 		<SkillsShowcase rows={skillRows} />
 	</section>
 	<section slot="after" class="mt-10" aria-labelledby="tags-heading">
-		<h2 id="tags-heading" class="text-xl font-semibold tracking-tight text-fg m-0 mb-1">Tags</h2>
-		<p class="text-fg-muted text-sm m-0 mb-4">
-			Everything I've written or built, clustered by topic. Bigger = more.
-		</p>
+		<h2 id="tags-heading" class="text-xl font-semibold tracking-tight text-fg m-0 mb-4">Tags</h2>
 		<TagCloud />
 	</section>
 </PostLayout>
