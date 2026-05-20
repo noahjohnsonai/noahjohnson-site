@@ -27,8 +27,6 @@ const caseStudies = await getCaseStudiesForProject(entry.id);
 	rawMarkdown={entry.body ?? ''}
 	rawFilename={`${entry.id}.md`}
 	showProgress={false}
-	cover={entry.data.cover}
-	coverAlt={entry.data.coverAlt}
 >
 	{skills.length > 0 && (
 		<section slot="belowHeader" class="mb-6" aria-labelledby="project-skills-heading">
@@ -50,6 +48,17 @@ const caseStudies = await getCaseStudiesForProject(entry.id);
 				</a>
 			))}
 		</aside>
+	)}
+	{entry.data.cover && (
+		<figure slot="belowHeader" class="mb-6">
+			<img
+				src={entry.data.cover}
+				alt={entry.data.coverAlt ?? ''}
+				class="w-full max-w-[50%] h-auto rounded-lg border border-border-soft block"
+				loading="lazy"
+				decoding="async"
+			/>
+		</figure>
 	)}
 	<div class="project-content">
 		<Content />
