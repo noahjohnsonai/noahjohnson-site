@@ -142,3 +142,19 @@ export function formatMonthYear(date: Date): string {
 		month: 'long',
 	});
 }
+
+// Estimate reading time in minutes from a markdown body. Strips frontmatter,
+// code fences, and markdown link/image syntax before counting words. Floors
+// to 1 minute minimum. Uses 220 wpm — average for technical prose.
+export function readingTimeMinutes(body: string): number {
+	if (!body) return 1;
+	const stripped = body
+		.replace(/```[\s\S]*?```/g, ' ')   // fenced code blocks
+		.replace(/`[^`]+`/g, ' ')          // inline code
+		.replace(/!\[[^\]]*\]\([^)]+\)/g, ' ')  // images
+		.replace(/\[([^\]]+)\]\([^)]+\)/g, '$1') // links: keep text
+		.replace(/^#+\s+/gm, '')           // heading markers
+		.replace(/[*_>#~|-]/g, ' ');       // residual markdown punctuation
+	const wordCount = stripped.split(/\s+/).filter(Boolean).length;
+	return Math.max(1, Math.round(wordCount / 220));
+}

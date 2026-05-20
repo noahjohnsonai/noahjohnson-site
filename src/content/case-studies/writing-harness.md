@@ -4,6 +4,8 @@ description: A grilling-instead-of-drafting workflow for AI-assisted writing, an
 pubDate: 2026-05-20
 draft: false
 project: noahjohnson-ai
+cover: /case-studies/writing-harness-cover.jpg
+coverAlt: Editorial illustration of a vintage typewriter on a wooden desk, three-quarter view, one terracotta-accented key on the keyboard, blank paper rolled into the carriage, warm dark background with soft directional light from upper left.
 tags:
   - claude-code
   - ai-augmented
@@ -12,7 +14,11 @@ tags:
   - case-study
 ---
 
-![Editorial illustration of a vintage typewriter on a wooden desk, three-quarter view, one terracotta-accented key on the keyboard, blank paper rolled into the carriage, warm dark background with soft directional light from upper left.](/case-studies/writing-harness-cover.jpg)
+## TLDR
+
+The default for AI-assisted writing is *the AI drafts, you edit*. That motion produces prose that's competent and quietly generic. The harness this article describes runs the opposite motion. The AI proposes nothing larger than a paragraph at a time, the human keeps, refines, rewrites, or drops each one, and a private voice scaffold constrains everything the agent produces. The trade is speed for voice. The article walks why, the methodology, and what's portable.
+
+## What this is
 
 The site you're reading runs on a writing harness I built on top of Claude Code. It's a small system of slash commands, two purpose-built agents, a voice scaffold that calibrates against my own prose, and a handful of conventions that govern how articles and case studies get drafted. The goal was modest. I wanted a writing tool that felt the same as the tool I was writing with, and I wanted that tool to produce prose that sounded like me instead of like an AI. What follows is the story of why the obvious approach to that second goal turned out to be wrong, and what we built instead.
 

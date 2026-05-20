@@ -1,7 +1,7 @@
 ---
 import Layout from './Layout.astro';
 import Prose from '../components/Prose.astro';
-import { formatAbsoluteDate, formatMonthYear } from '../lib/data.ts';
+import { formatAbsoluteDate, formatMonthYear, readingTimeMinutes } from '../lib/data.ts';
 
 interface ExampleRef {
 	slug: string;
@@ -21,6 +21,8 @@ interface Props {
 	rawMarkdown: string;
 	rawFilename: string;
 	examples?: ExampleRef[];
+	cover?: string;     // hero image path under public/
+	coverAlt?: string;  // hero image alt text
 	dateFormat?: 'full' | 'month-year';
 }
 const {
@@ -34,8 +36,12 @@ const {
 	rawMarkdown,
 	rawFilename,
 	examples = [],
+	cover,
+	coverAlt,
 	dateFormat = 'full',
 } = Astro.props;
+
+const readMinutes = rawMarkdown ? readingTimeMinutes(rawMarkdown) : 0;
 
 const fmt = dateFormat === 'month-year' ? formatMonthYear : formatAbsoluteDate;
 
@@ -59,6 +65,17 @@ const breadcrumbs =
 	examples={examples}
 >
 	<article>
+		{cover && (
+			<figure class="post-hero -mt-6 mb-8">
+				<img
+					src={cover}
+					alt={coverAlt ?? ''}
+					class="w-full h-auto rounded-lg border border-border-soft block"
+					loading="eager"
+					decoding="async"
+				/>
+			</figure>
+		)}
 		<header class="mb-8">
 			<h1 class="text-2xl sm:text-3xl font-semibold tracking-tight text-fg leading-tight m-0 mb-2">
 				{title}
@@ -76,6 +93,12 @@ const breadcrumbs =
 					<>
 						<span>•</span>
 						<span>updated <time datetime={updatedDate.toISOString()}>{fmt(updatedDate)}</time></span>
+					</>
+				)}
+				{readMinutes > 0 && (
+					<>
+						<span>•</span>
+						<span>{readMinutes} min read</span>
 					</>
 				)}
 				{tags.length > 0 && (

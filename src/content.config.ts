@@ -10,6 +10,8 @@ const postSchema = z.object({
 	tags: z.array(z.string()).default([]),
 	draft: z.boolean().default(false),
 	featured: z.boolean().default(false),
+	cover: z.string().optional(),     // path under public/, e.g. /case-studies/foo.jpg
+	coverAlt: z.string().optional(),  // alt text for the hero cover image
 });
 
 const posts = defineCollection({
@@ -34,10 +36,11 @@ const about = defineCollection({
 	}),
 });
 
-// Case studies: 1:1 with projects. `project` is the slug of the corresponding
-// project under src/content/projects/. Build-time uniqueness is enforced in
-// src/lib/data.ts via assertUniqueCaseStudyProjects(), called from the
-// case-studies routes.
+// Case studies: paired with projects via the `project` slug (N:1 allowed,
+// reversed from the original 1:1 plan on 2026-05-20). `project` must
+// match an existing project slug under src/content/projects/. Validated at
+// build time by assertCaseStudyInvariants in src/lib/data.ts, called from
+// the case-studies routes.
 const caseStudySchema = postSchema.extend({
 	project: z.string(),
 });

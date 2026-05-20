@@ -78,22 +78,11 @@ For each candidate, ask via AskUserQuestion. Take-home rules:
 
 Before handing the draft off for review, scan against DEFAULT.md's explicit don'ts and the chosen style profile's failure modes. Surface every flagged sentence verbatim with the rule cited. Do not auto-fix.
 
-## Publish-flip (mandatory before review)
-
-If your content collection uses a `draft: true | false` frontmatter field (Astro's default pattern), the scaffold step almost certainly created the file with `draft: true` so the half-written piece never appeared on the site while you iterated. Before opening the PR, flip it back:
-
-1. Read the frontmatter.
-2. If `draft: true` is present, edit it to `draft: false`.
-3. Verify with `grep '^draft:' <path>` — should print `draft: false`.
-
-Skipping this is the most common publish-time failure mode for this kind of harness. A draft-flagged article merges to main but is invisible on the site because the collection's sort/filter helpers and the static-path generator both drop draft entries. The article looks shipped but isn't.
-
 ## Hard rules
 
 - Never draft more than one paragraph between approvals.
 - Never invent project-specific names in take-home files.
 - Never skip the voice check.
-- Never skip the publish-flip step.
 - Every question goes through AskUserQuestion. One at a time. Recommendation-first.
 - If the voice scaffold files are missing or incomplete, stop and surface the gap.
 ```

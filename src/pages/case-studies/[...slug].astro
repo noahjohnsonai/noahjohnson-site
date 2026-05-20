@@ -28,6 +28,8 @@ const examples = await getReferencedExamples(entry.body ?? '');
 	rawMarkdown={entry.body ?? ''}
 	rawFilename={`${entry.id}.md`}
 	examples={examples}
+	cover={entry.data.cover}
+	coverAlt={entry.data.coverAlt}
 >
 	<div class="project-content">
 		<Content />
