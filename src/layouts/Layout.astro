@@ -148,7 +148,7 @@ const recentEntries = [...recentPosts, ...recentProjects];
 			const RP_KEY = 'nj:rp';
 			const RP_DEFAULT_WIDTH = 320;
 			const RP_MIN = 240;
-			const RP_MAX = 600;
+			const RP_MAX = Math.min(window.innerWidth * 0.7, 1200);
 
 			const getRPState = () => {
 				try {
