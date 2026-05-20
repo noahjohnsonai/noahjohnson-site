@@ -48,15 +48,22 @@ const recentEntries = [...recentPosts, ...recentProjects];
 				class="flex-1 overflow-y-auto relative"
 				transition:animate="fade"
 			>
-				<div class="max-w-3xl mx-auto px-4 sm:px-6 py-6">
+				<div class="max-w-3xl xl:max-w-5xl 2xl:max-w-6xl mx-auto px-4 sm:px-6 py-6">
 					<slot />
 				</div>
 			</main>
-			<Mascot
-				size={72}
-				class="mascot absolute right-3 sm:right-6 opacity-90 pointer-events-none select-none z-10 sm:!w-[88px] sm:!h-[57px]"
+			{/* Mascot anchored to the right edge of the centered content column */}
+			<div
+				class="mascot-anchor absolute inset-x-0 px-4 lg:px-6 pointer-events-none"
 				style="bottom: 6.25rem"
-			/>
+			>
+				<div class="max-w-3xl xl:max-w-5xl 2xl:max-w-6xl mx-auto relative">
+					<Mascot
+						size={72}
+						class="mascot absolute right-0 bottom-0 opacity-90 pointer-events-none select-none z-10 sm:!w-[88px] sm:!h-[57px]"
+					/>
+				</div>
+			</div>
 			<SearchBar />
 			<SearchOverlay recentEntries={recentEntries} />
 		</div>
