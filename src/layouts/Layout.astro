@@ -48,7 +48,7 @@ const recentEntries = [...recentPosts, ...recentProjects];
 				class="flex-1 overflow-y-auto relative"
 				transition:animate="fade"
 			>
-				<div class="max-w-3xl xl:max-w-5xl 2xl:max-w-6xl mx-auto px-4 sm:px-6 py-6">
+				<div class="content-col px-4 sm:px-6 py-6">
 					<slot />
 				</div>
 			</main>
@@ -57,7 +57,7 @@ const recentEntries = [...recentPosts, ...recentProjects];
 				class="mascot-anchor absolute inset-x-0 px-4 lg:px-6 pointer-events-none"
 				style="bottom: 6.25rem"
 			>
-				<div class="max-w-3xl xl:max-w-5xl 2xl:max-w-6xl mx-auto relative">
+				<div class="content-col relative">
 					<Mascot
 						size={72}
 						class="mascot absolute right-0 bottom-0 opacity-90 pointer-events-none select-none z-10 sm:!w-[88px] sm:!h-[57px]"
@@ -69,6 +69,32 @@ const recentEntries = [...recentPosts, ...recentProjects];
 		</div>
 
 		<RightPanel rawMarkdown={rawMarkdown} filename={rawFilename} />
+	</div>
+
+	{/* Image lightbox overlay — populated by JS on click of any .prose img */}
+	<div
+		id="lightbox"
+		class="fixed inset-0 z-[60] hidden items-center justify-center p-6 bg-bg/95 cursor-zoom-out"
+		role="dialog"
+		aria-modal="true"
+		aria-hidden="true"
+	>
+		<button
+			type="button"
+			id="lightbox-close"
+			class="absolute top-4 right-4 p-2 rounded-md text-fg-muted hover:bg-surface hover:text-fg bg-transparent border-0 cursor-pointer z-10"
+			aria-label="Close image"
+		>
+			<svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+				<path d="M5 5l10 10M15 5l-10 10" />
+			</svg>
+		</button>
+		<img
+			id="lightbox-img"
+			src=""
+			alt=""
+			class="max-w-[95vw] max-h-[90vh] rounded-lg border border-border-soft shadow-2xl object-contain"
+		/>
 	</div>
 
 	<script>
@@ -399,10 +425,76 @@ const recentEntries = [...recentPosts, ...recentProjects];
 						// re-resolve overlay since it lives in DOM
 						document.getElementById('searchbar-trigger')?.click();
 					} else if (e.key === 'Escape') {
-						document.getElementById('search-close')?.click();
+						// Close lightbox first if open, otherwise search overlay
+						const lb = document.getElementById('lightbox');
+						if (lb && !lb.classList.contains('hidden')) {
+							document.getElementById('lightbox-close')?.click();
+						} else {
+							document.getElementById('search-close')?.click();
+						}
 					}
 				});
 			}
+
+			// --- Image lightbox helpers (shared with prose-img listeners below) ---
+			const lightbox = document.getElementById('lightbox');
+			const lightboxImg = document.getElementById('lightbox-img') as HTMLImageElement | null;
+			const lightboxClose = document.getElementById('lightbox-close');
+			const openLightbox = (src: string, alt: string) => {
+				if (!lightbox || !lightboxImg) return;
+				lightboxImg.src = src;
+				lightboxImg.alt = alt || '';
+				lightbox.classList.remove('hidden');
+				lightbox.classList.add('flex');
+				lightbox.setAttribute('aria-hidden', 'false');
+				document.body.style.overflow = 'hidden';
+			};
+			const closeLightbox = () => {
+				if (!lightbox) return;
+				lightbox.classList.add('hidden');
+				lightbox.classList.remove('flex');
+				lightbox.setAttribute('aria-hidden', 'true');
+				document.body.style.overflow = '';
+			};
+			if (lightbox) (lightbox as HTMLElement).onclick = (e) => {
+				if (e.target === lightbox || e.target === lightboxImg) closeLightbox();
+			};
+			if (lightboxClose) (lightboxClose as HTMLElement).onclick = closeLightbox;
+
+			// --- Active sidebar item ---
+			// Sidebar is transition:persist'd so the SSR-computed active class
+			// from the previous page sticks. Re-apply on every page-load.
+			(() => {
+				const path = location.pathname.replace(/\/$/, '') || '/';
+				const links = document.querySelectorAll('#sidebar a[data-slug]');
+				links.forEach((a) => {
+					const href = (a.getAttribute('href') || '').replace(/\/$/, '');
+					const isActive = href === path;
+					if (isActive) {
+						a.classList.add('bg-surface', 'text-fg', 'font-medium');
+						a.classList.remove('text-fg-muted');
+						a.setAttribute('aria-current', 'page');
+					} else {
+						a.classList.remove('bg-surface', 'text-fg', 'font-medium');
+						a.classList.add('text-fg-muted');
+						a.removeAttribute('aria-current');
+					}
+				});
+			})();
+
+			// --- Image lightbox for prose images ---
+			// Click any markdown image to expand it over the page. ESC or
+			// click-outside closes.
+			(() => {
+				const imgs = document.querySelectorAll('.prose img');
+				imgs.forEach((img) => {
+					const el = img as HTMLImageElement;
+					if (el.dataset.lbInit) return;
+					el.dataset.lbInit = '1';
+					el.style.cursor = 'zoom-in';
+					el.addEventListener('click', () => openLightbox(el.src, el.alt));
+				});
+			})();
 
 			// --- OS-aware keyboard shortcut label (⌘K vs Ctrl K) ---
 			const ua = navigator.userAgent;

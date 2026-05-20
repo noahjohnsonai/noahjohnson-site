@@ -20,6 +20,13 @@
 	/* Typography */
 	--font-sans: "Geist Variable", system-ui, -apple-system, Segoe UI, sans-serif;
 	--font-mono: "Geist Mono Variable", ui-monospace, SFMono-Regular, Menlo, monospace;
+
+	/* Extra breakpoints beyond Tailwind's defaults (sm 640, md 768,
+	   lg 1024, xl 1280, 2xl 1536). These extend reading width on
+	   ultrawide / 4K displays. */
+	--breakpoint-3xl: 1920px;
+	--breakpoint-4xl: 2560px;
+	--breakpoint-5xl: 3440px;
 }
 
 /* Base reset */
@@ -78,3 +85,18 @@ body {
 button, a {
 	transition: color 120ms ease, background-color 120ms ease, border-color 120ms ease;
 }
+
+/* Centered content column that scales across all viewport sizes.
+   Tailwind's @theme breakpoint ordering doesn't reliably sort custom
+   breakpoints alongside built-in ones, so we use hand-written media
+   queries to guarantee the cascade order. */
+.content-col {
+	max-width: 48rem; /* 768px, mobile baseline */
+	margin-left: auto;
+	margin-right: auto;
+}
+@media (min-width: 1280px) { .content-col { max-width: 64rem; } }  /* xl */
+@media (min-width: 1536px) { .content-col { max-width: 72rem; } }  /* 2xl */
+@media (min-width: 1920px) { .content-col { max-width: 80rem; } }  /* 3xl */
+@media (min-width: 2560px) { .content-col { max-width: 100rem; } } /* 4xl */
+@media (min-width: 3440px) { .content-col { max-width: 125rem; } } /* 5xl ultrawide / 4K */
