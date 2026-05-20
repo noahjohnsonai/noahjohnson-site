@@ -604,28 +604,41 @@ const recentEntries = [...recentPosts, ...recentProjects];
 			const KEY = 'nj:visited';
 			const visited: Record<string, true> = JSON.parse(localStorage.getItem(KEY) ?? '{}');
 
-			// Sync every dot in BOTH directions — show for unvisited, hide for visited.
-			// Without the else branch, dots stayed lit on previously-unvisited slugs
-			// even after the user navigated to them, until a full refresh.
+			// Sync every dot to its visited state. Unvisited dots have no
+			// data-visited attribute (CSS renders them as filled accent
+			// circles); visited dots get data-visited="1" (CSS renders as
+			// hollow outline circles with a "Viewed" tooltip on hover).
 			const syncDots = () => {
 				const v: Record<string, true> = JSON.parse(localStorage.getItem(KEY) ?? '{}');
 				document.querySelectorAll('[data-unvisited-dot]').forEach((el) => {
 					const slug = el.getAttribute('data-unvisited-dot');
-					(el as HTMLElement).style.opacity = slug && !v[slug] ? '1' : '0';
+					if (slug && v[slug]) {
+						el.setAttribute('data-visited', '1');
+					} else {
+						el.removeAttribute('data-visited');
+					}
 				});
 			};
 			syncDots();
 
-			// Mark current slug as visited if we're on a post/project/about page
+			// Mark current slug as visited if we're on a post/project/about/case-study page
 			const path = location.pathname.replace(/\/$/, '').replace(/^\//, '');
-			if (path && (path.startsWith('posts/') || path.startsWith('projects/') || path === 'about')) {
+			if (
+				path && (
+					path.startsWith('posts/') ||
+					path.startsWith('projects/') ||
+					path.startsWith('case-studies/') ||
+					path === 'about'
+				)
+			) {
 				visited[path] = true;
 				localStorage.setItem(KEY, JSON.stringify(visited));
 			}
 
-			// Real-time: when the user clicks a sidebar link to a post/project/about,
-			// mark it visited and hide its dot immediately — don't wait for the
-			// destination page's init() to fire after the view transition.
+			// Real-time: when the user clicks a sidebar link, mark it visited
+			// and flip the dot to the visited state immediately — don't wait
+			// for the destination page's init() to fire after the view
+			// transition.
 			document.querySelectorAll('aside#sidebar a[data-slug]').forEach((el) => {
 				const a = el as HTMLAnchorElement;
 				if (a.dataset.dotInit) return;
@@ -636,8 +649,8 @@ const recentEntries = [...recentPosts, ...recentProjects];
 					const v: Record<string, true> = JSON.parse(localStorage.getItem(KEY) ?? '{}');
 					v[slug] = true;
 					localStorage.setItem(KEY, JSON.stringify(v));
-					const dot = a.querySelector('[data-unvisited-dot]') as HTMLElement | null;
-					if (dot) dot.style.opacity = '0';
+					const dot = a.querySelector('[data-unvisited-dot]');
+					if (dot) dot.setAttribute('data-visited', '1');
 				});
 			});
 		}

@@ -1,6 +1,10 @@
 ---
 // One sidebar "session" row. Shows status dot + title.
-// The status dot is hidden by default; JS in BaseLayout reveals it for unvisited posts (data-unvisited).
+// The status dot has two states, controlled by JS in Layout via the
+// `data-visited` attribute on the inner span:
+//   - unvisited (default): filled accent-soft circle (Claude Code "needs input")
+//   - visited: hollow outline circle (Claude Code "already handled")
+// JS sets data-visited="1" once the user has been to a page.
 interface Props {
 	href: string;
 	title: string;
@@ -25,7 +29,7 @@ const { href, title, slug, meta, active = false, featured = false } = Astro.prop
 		]}
 	>
 		<span
-			class="shrink-0 inline-block w-1.5 h-1.5 rounded-full bg-accent-soft opacity-0 transition-opacity"
+			class="sidebar-dot shrink-0 inline-block w-2 h-2 rounded-full transition-colors"
 			data-unvisited-dot={slug}
 			aria-hidden="true"
 		></span>
@@ -44,3 +48,40 @@ const { href, title, slug, meta, active = false, featured = false } = Astro.prop
 		}
 	</a>
 </li>
+
+<style is:global>
+	/* Two-state status dot, controlled by data-visited (set by Layout JS). */
+	.sidebar-dot {
+		position: relative;
+		background: var(--color-accent-soft);
+		border: 1px solid transparent;
+	}
+	.sidebar-dot[data-visited="1"] {
+		background: transparent;
+		border-color: var(--color-fg-dim);
+	}
+	/* "Viewed" pill on hover of the visited-state dot. Matches the
+	   ScrollProgress tooltip treatment for visual consistency. */
+	.sidebar-dot[data-visited="1"]::after {
+		content: "Viewed";
+		position: absolute;
+		left: 50%;
+		bottom: calc(100% + 6px);
+		transform: translateX(-50%);
+		background: var(--color-bg-elevated);
+		border: 1px solid var(--color-border-soft);
+		color: var(--color-fg-muted);
+		font-size: 10px;
+		font-weight: 500;
+		padding: 2px 6px;
+		border-radius: 4px;
+		white-space: nowrap;
+		opacity: 0;
+		pointer-events: none;
+		transition: opacity 120ms ease;
+		z-index: 50;
+	}
+	.sidebar-dot[data-visited="1"]:hover::after {
+		opacity: 1;
+	}
+</style>
