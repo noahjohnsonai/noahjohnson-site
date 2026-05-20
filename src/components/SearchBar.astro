@@ -1,0 +1,159 @@
+---
+// Bottom-of-main prompt-styled search input + meta row beneath it.
+// The meta row mirrors Claude Code's lower toolbar:
+//   left:  Auto pill + plus + mic + chevron
+//   right: model name + circular usage dial (decorative, shows ~90%)
+---
+
+<div class="search-bar shrink-0 px-4 lg:px-6 pt-3 pb-3 bg-bg">
+	<button
+		type="button"
+		id="searchbar-trigger"
+		class="w-full flex items-center gap-3 px-4 py-3 rounded-xl border border-border bg-bg-elevated text-fg-muted hover:bg-surface hover:border-surface-hover transition-colors text-left text-[14px] cursor-pointer"
+		aria-label="Search posts"
+	>
+		<svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="shrink-0 text-fg-dim" aria-hidden="true">
+			<path d="M3 7a4 4 0 1 0 8 0 4 4 0 1 0-8 0M13 13l-3-3" />
+		</svg>
+		<span class="flex-1 text-fg-dim">Search posts or type / for commands</span>
+		<kbd class="hidden sm:inline-block text-[11px] text-fg-dim border border-border rounded px-1.5 py-px font-mono" data-kbd-modifier>⌘K</kbd>
+	</button>
+
+	{/* Meta row — Claude Code-style toolbar below the prompt */}
+	<div class="flex items-center justify-between mt-2.5 px-1 select-none">
+		<div class="flex items-center gap-1">
+			{/* Auto pill */}
+			<span class="inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-medium bg-yellow-500/15 text-yellow-400 tracking-wide">
+				Auto
+			</span>
+			{/* + icon */}
+			<button
+				type="button"
+				aria-label="Attach"
+				class="p-1.5 rounded-md text-fg-muted hover:bg-surface hover:text-fg bg-transparent border-0 cursor-pointer"
+			>
+				<svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true">
+					<path d="M7 2v10M2 7h10" />
+				</svg>
+			</button>
+			{/* Mic icon */}
+			<button
+				type="button"
+				aria-label="Voice"
+				class="p-1.5 rounded-md text-fg-muted hover:bg-surface hover:text-fg bg-transparent border-0 cursor-pointer"
+			>
+				<svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+					<rect x="5" y="1.5" width="4" height="7" rx="2" />
+					<path d="M2.5 6a4.5 4.5 0 0 0 9 0M7 10.5v2" />
+				</svg>
+			</button>
+			{/* Chevron */}
+			<button
+				type="button"
+				aria-label="More options"
+				class="p-1.5 rounded-md text-fg-muted hover:bg-surface hover:text-fg bg-transparent border-0 cursor-pointer"
+			>
+				<svg width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+					<path d="M3 4.5 6 8l3-3.5" />
+				</svg>
+			</button>
+		</div>
+
+		<div class="flex items-center gap-2 text-[12px] text-fg-muted relative group">
+			<span class="whitespace-nowrap">
+				<span class="text-fg-muted">Opus 4.7</span>
+				<span class="text-fg-dim ml-1">1M</span>
+				<span class="text-fg-dim mx-1">·</span>
+				<span class="text-fg-dim">Max</span>
+			</span>
+			{/* Usage dial — ~90% filled. Hover reveals the usage popover above. */}
+			<svg
+				width="14"
+				height="14"
+				viewBox="0 0 20 20"
+				fill="none"
+				aria-label="Context usage 92%"
+				role="img"
+				class="cursor-pointer"
+			>
+				<circle cx="10" cy="10" r="8" stroke="#2A2825" stroke-width="2.5" fill="none" />
+				<circle
+					cx="10"
+					cy="10"
+					r="8"
+					stroke="#D97757"
+					stroke-width="2.5"
+					fill="none"
+					stroke-dasharray="50.265"
+					stroke-dashoffset="4.02"
+					stroke-linecap="round"
+					transform="rotate(-90 10 10)"
+				/>
+			</svg>
+
+			{/* Hover popover — Claude Code-style usage panel */}
+			<div
+				class="usage-popover absolute bottom-full right-0 mb-2 w-[320px] opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-opacity duration-150 z-30 text-left"
+				role="tooltip"
+			>
+				<div class="bg-bg-elevated border border-border rounded-xl shadow-2xl p-2">
+					{/* Context window — highlighted */}
+					<div class="rounded-lg border border-accent/40 px-3 py-2.5 mb-1">
+						<div class="flex items-center justify-between">
+							<span class="text-fg text-[13px] font-medium">Context window</span>
+							<span class="flex items-center gap-1 text-fg-muted text-[12px]">
+								<span>920k / 1.0M (92%)</span>
+								<svg width="10" height="10" viewBox="0 0 10 10" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+									<path d="M3.5 2L6.5 5L3.5 8" />
+								</svg>
+							</span>
+						</div>
+						<div class="mt-2 h-1 bg-surface rounded-full overflow-hidden">
+							<div class="h-full bg-accent rounded-full" style="width: 92%"></div>
+						</div>
+					</div>
+
+					<p class="text-fg-muted text-[11px] uppercase tracking-wider font-semibold px-3 pt-3 pb-1 flex items-center justify-between">
+						<span>Plan usage</span>
+						<svg width="11" height="11" viewBox="0 0 11 11" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="opacity-60" aria-hidden="true">
+							<path d="M3 5.5h5M6 3l2.5 2.5L6 8" />
+						</svg>
+					</p>
+
+					{/* 5-hour limit */}
+					<div class="px-3 py-2">
+						<div class="flex items-center justify-between">
+							<span class="text-fg text-[13px] font-medium">5-hour limit</span>
+							<span class="text-fg-muted text-[12px]">88% · resets 12m</span>
+						</div>
+						<div class="mt-1.5 h-1 bg-surface rounded-full overflow-hidden">
+							<div class="h-full bg-accent rounded-full" style="width: 88%"></div>
+						</div>
+					</div>
+
+					{/* Weekly · all models */}
+					<div class="px-3 py-2">
+						<div class="flex items-center justify-between">
+							<span class="text-fg text-[13px] font-medium">Weekly · all models</span>
+							<span class="text-fg-muted text-[12px]">91% · resets 2d</span>
+						</div>
+						<div class="mt-1.5 h-1 bg-surface rounded-full overflow-hidden">
+							<div class="h-full bg-accent rounded-full" style="width: 91%"></div>
+						</div>
+					</div>
+
+					{/* Opus only */}
+					<div class="px-3 py-2">
+						<div class="flex items-center justify-between">
+							<span class="text-fg text-[13px] font-medium">Opus only</span>
+							<span class="text-fg-muted text-[12px]">76% · resets 2d</span>
+						</div>
+						<div class="mt-1.5 h-1 bg-surface rounded-full overflow-hidden">
+							<div class="h-full bg-accent rounded-full" style="width: 76%"></div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>

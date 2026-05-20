@@ -1,37 +1,33 @@
-import { defineCollection } from "astro:content";
-import { z } from "astro/zod";
-import { glob } from "astro/loaders";
-import config from "@/config";
+import { defineCollection } from 'astro:content';
+import { glob } from 'astro/loaders';
+import { z } from 'astro/zod';
 
-export const BLOG_PATH = "src/content/posts";
+const postSchema = z.object({
+	title: z.string(),
+	description: z.string(),
+	pubDate: z.coerce.date(),
+	updatedDate: z.coerce.date().optional(),
+	tags: z.array(z.string()).default([]),
+	draft: z.boolean().default(false),
+	featured: z.boolean().default(false),
+});
 
 const posts = defineCollection({
-  loader: glob({ pattern: "**/[^_]*.{md,mdx}", base: `./${BLOG_PATH}` }),
-  schema: ({ image }) =>
-    z.object({
-      author: z.string().default(config.site.author),
-      pubDatetime: z.date(),
-      modDatetime: z.date().optional().nullable(),
-      title: z.string(),
-      featured: z.boolean().optional(),
-      draft: z.boolean().optional(),
-      tags: z.array(z.string()).default(["others"]),
-      ogImage: image().or(z.string()).optional(),
-      description: z.string(),
-      canonicalURL: z.string().optional(),
-      hideEditPost: z.boolean().optional(),
-      timezone: z.string().optional(),
-    }),
+	loader: glob({ base: './src/content/posts', pattern: '**/*.{md,mdx}' }),
+	schema: postSchema,
 });
 
-const pages = defineCollection({
-  loader: glob({ pattern: "**/[^_]*.{md,mdx}", base: "./src/content/pages" }),
-  schema: z.object({
-    title: z.string(),
-    description: z.string().optional(),
-    ogImage: z.string().optional(),
-    canonicalURL: z.string().optional(),
-  }),
+const projects = defineCollection({
+	loader: glob({ base: './src/content/projects', pattern: '**/*.{md,mdx}' }),
+	schema: postSchema,
 });
 
-export const collections = { posts, pages };
+const about = defineCollection({
+	loader: glob({ base: './src/content/about', pattern: '**/*.{md,mdx}' }),
+	schema: z.object({
+		title: z.string().default('About'),
+		description: z.string().optional(),
+	}),
+});
+
+export const collections = { posts, projects, about };

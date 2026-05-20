@@ -1,37 +1,80 @@
 @import "tailwindcss";
-@import "./theme.css";
-@import "./typography.css";
+@import "@fontsource-variable/geist";
+@import "@fontsource-variable/geist-mono";
 
-@custom-variant dark (&:where([data-theme=dark], [data-theme=dark] *));
+@theme {
+	/* Palette — matches Claude Code desktop screenshot */
+	--color-bg:           #1A1A1A;
+	--color-bg-elevated:  #1F1E1D;
+	--color-surface:      #232220;
+	--color-surface-hover:#2A2825;
+	--color-border:       #2A2825;
+	--color-border-soft:  #221F1C;
+	--color-fg:           #E6E0D8;
+	--color-fg-muted:     #9A9590;
+	--color-fg-dim:       #6E6A65;
+	--color-accent:       #D97757;
+	--color-accent-soft:  #E08A6E;
+	--color-accent-dim:   #8C4A36;
 
-@layer base {
-  * {
-    @apply border-border outline-accent/75;
-    scrollbar-width: auto;
-    scrollbar-color: var(--color-muted) transparent;
-  }
-  a,
-  button {
-    @apply outline-accent outline-offset-1 focus-visible:no-underline focus-visible:outline-2 focus-visible:outline-dashed;
-  }
-  button:not(:disabled),
-  [role="button"]:not(:disabled) {
-    cursor: pointer;
-  }
+	/* Typography */
+	--font-sans: "Geist Variable", system-ui, -apple-system, Segoe UI, sans-serif;
+	--font-mono: "Geist Mono Variable", ui-monospace, SFMono-Regular, Menlo, monospace;
 }
 
-@utility max-w-app {
-  @apply max-w-3xl;
+/* Base reset */
+*,
+*::before,
+*::after {
+	box-sizing: border-box;
 }
 
-@utility app-layout {
-  @apply max-w-app mx-auto w-full px-4;
+html {
+	background-color: var(--color-bg);
+	color: var(--color-fg);
+	font-family: var(--font-sans);
+	font-feature-settings: "ss01", "cv11";
+	-webkit-font-smoothing: antialiased;
+	-moz-osx-font-smoothing: grayscale;
+	color-scheme: dark;
 }
 
-@utility active-nav {
-  @apply underline decoration-wavy decoration-2 underline-offset-8;
+body {
+	margin: 0;
+	min-height: 100vh;
 }
 
-:target {
-  scroll-margin-block: 1rem;
+/* Scrollbar — subtle, matches the dark palette */
+::-webkit-scrollbar {
+	width: 10px;
+	height: 10px;
+}
+::-webkit-scrollbar-track {
+	background: transparent;
+}
+::-webkit-scrollbar-thumb {
+	background: var(--color-surface);
+	border-radius: 6px;
+	border: 2px solid var(--color-bg);
+}
+::-webkit-scrollbar-thumb:hover {
+	background: var(--color-surface-hover);
+}
+
+/* Selection */
+::selection {
+	background: var(--color-accent);
+	color: var(--color-bg);
+}
+
+/* Focus rings */
+:focus-visible {
+	outline: 2px solid var(--color-accent);
+	outline-offset: 2px;
+	border-radius: 2px;
+}
+
+/* Subtle global transitions */
+button, a {
+	transition: color 120ms ease, background-color 120ms ease, border-color 120ms ease;
 }

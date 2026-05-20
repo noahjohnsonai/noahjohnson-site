@@ -1,36 +1,21 @@
 ---
-import { getEntry, render } from "astro:content";
-import Layout from "@/layouts/Layout.astro";
-import Header from "@/components/Header.astro";
-import Breadcrumb from "@/components/Breadcrumb.astro";
-import Main from "@/components/Main.astro";
-import Footer from "@/components/Footer.astro";
-import config from "@/config";
+import { getEntry, render } from 'astro:content';
+import PostLayout from '../layouts/PostLayout.astro';
 
-const about = await getEntry("pages", "about");
-
-if (!about) {
-  throw new Error(
-    "Missing content entry: `about.md` or `about.mdx` in `src/content/pages/`"
-  );
+const entry = await getEntry('about', 'about');
+if (!entry) {
+	throw new Error('Missing about.md content at src/content/about/about.md');
 }
-
-const { Content } = await render(about);
+const { Content } = await render(entry);
 ---
 
-<Layout
-  title={`${about.data.title} | ${config.site.title}`}
-  description={about.data.description}
-  ogImage={about.data.ogImage}
-  canonicalURL={about.data.canonicalURL}
+<PostLayout
+	title={entry.data.title ?? 'About'}
+	description={entry.data.description}
+	collectionLabel="About"
+	collectionHref="/about/"
+	rawMarkdown={entry.body ?? ''}
+	rawFilename="about.md"
 >
-  <Header />
-
-  <Breadcrumb />
-
-  <Main pageTitle={about.data.title} class="app-prose">
-    <Content />
-  </Main>
-
-  <Footer />
-</Layout>
+	<Content />
+</PostLayout>

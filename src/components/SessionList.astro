@@ -1,0 +1,53 @@
+---
+import type { CollectionEntry } from 'astro:content';
+import { formatRelativeDate } from '../lib/data.ts';
+
+interface Props {
+	heading?: string;
+	entries: (CollectionEntry<'posts'> | CollectionEntry<'projects'>)[];
+	collection: 'posts' | 'projects';
+}
+const { heading = 'Sessions', entries, collection } = Astro.props;
+---
+
+<section class="session-list px-2 sm:px-4 mt-2">
+	<h2 class="text-[11px] uppercase tracking-wider text-fg-muted font-semibold px-3 mb-2">
+		{heading}
+	</h2>
+	{
+		entries.length === 0 ? (
+			<p class="text-sm text-fg-dim italic px-3 py-4">Nothing here yet.</p>
+		) : (
+			<ul class="list-none p-0 m-0 border border-border-soft rounded-lg overflow-hidden divide-y divide-border-soft bg-bg-elevated">
+				{entries.map((entry) => (
+					<li>
+						<a
+							href={`/${collection}/${entry.id}/`}
+							class="flex items-center gap-3 px-4 py-3.5 no-underline hover:bg-surface transition-colors group"
+							data-slug={`${collection}/${entry.id}`}
+						>
+							<span
+								class="shrink-0 inline-block w-2 h-2 rounded-full bg-accent-soft opacity-0 transition-opacity"
+								data-unvisited-dot={`${collection}/${entry.id}`}
+								aria-hidden="true"
+							/>
+							<span class="flex-1 min-w-0">
+								<span class="block text-fg font-medium text-[15px] truncate">
+									{entry.data.title}
+								</span>
+								{entry.data.description && (
+									<span class="block text-fg-muted text-[13px] mt-1 truncate">
+										{entry.data.description}
+									</span>
+								)}
+							</span>
+							<span class="shrink-0 text-[12px] text-fg-dim group-hover:text-fg-muted">
+								{formatRelativeDate(entry.data.pubDate)}
+							</span>
+						</a>
+					</li>
+				))}
+			</ul>
+		)
+	}
+</section>

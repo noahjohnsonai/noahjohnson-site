@@ -1,0 +1,33 @@
+---
+// Pure-CSS collapsible year sub-group. Uses <details>/<summary> for accessibility + no-JS expand.
+interface Props {
+	year: number;
+	defaultOpen?: boolean;
+}
+const { year, defaultOpen = true } = Astro.props;
+---
+
+<details class="group/year ml-3 mt-1" open={defaultOpen}>
+	<summary class="flex items-center gap-1.5 px-3 py-1 mx-2 text-xs uppercase tracking-wider text-fg-dim hover:text-fg-muted cursor-pointer select-none rounded-md hover:bg-surface list-none">
+		<svg
+			width="10"
+			height="10"
+			viewBox="0 0 10 10"
+			fill="none"
+			class="shrink-0 transition-transform group-open/year:rotate-90"
+			aria-hidden="true"
+		>
+			<path d="M3 2L7 5L3 8" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+		</svg>
+		<span>{year}</span>
+	</summary>
+	<ul class="mt-0.5 mb-1 px-0">
+		<slot />
+	</ul>
+</details>
+
+<style>
+	/* Hide the default disclosure marker on browsers that don't honor list-style:none on summary */
+	summary::-webkit-details-marker { display: none; }
+	summary::marker { content: ""; }
+</style>

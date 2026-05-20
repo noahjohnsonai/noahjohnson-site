@@ -1,0 +1,72 @@
+---
+import Layout from '../layouts/Layout.astro';
+import Prose from '../components/Prose.astro';
+import { SITE_URL, SITE_TITLE } from '../consts.ts';
+
+const feedUrl = `${SITE_URL}rss.xml`;
+const sitemapUrl = `${SITE_URL}sitemap-index.xml`;
+
+const rawMarkdown = `# Subscribe to ${SITE_TITLE}
+
+Feed URLs you can paste into any RSS reader:
+
+  RSS:     ${feedUrl}
+  Sitemap: ${sitemapUrl}
+
+The feed includes blog posts and projects, sorted by publish date.
+
+Popular readers:
+
+  - Feedly        https://feedly.com
+  - NetNewsWire   https://netnewswire.com
+  - Inoreader     https://inoreader.com
+  - Reeder        https://reederapp.com
+`;
+---
+
+<Layout
+	title="Subscribe"
+	description="Subscribe to noahjohnson.ai via RSS"
+	breadcrumbs={[{ label: 'noahjohnson.ai', href: '/' }, { label: 'Subscribe' }]}
+	rawMarkdown={rawMarkdown}
+	rawFilename="subscribe.md"
+>
+	<article>
+		<header class="mb-8">
+			<h1 class="text-2xl sm:text-3xl font-semibold tracking-tight text-fg leading-tight m-0 mb-2">
+				Subscribe
+			</h1>
+			<p class="text-fg-muted text-base m-0">
+				Follow new posts via RSS. The feed URL is on the right (open the .md panel).
+			</p>
+		</header>
+
+		<Prose>
+			<p>
+				This site doesn't have a newsletter yet — but it does have an RSS feed. Paste the feed URL into your reader of choice and new posts will land there automatically. No email, no tracking, no algorithm.
+			</p>
+
+			<h2>Feed URL</h2>
+			<p>
+				<a href="/rss.xml"><code>{feedUrl}</code></a>
+			</p>
+
+			<h2>Recommended readers</h2>
+			<ul>
+				<li><a href="https://feedly.com" target="_blank" rel="noopener">Feedly</a> — web + mobile, free tier available</li>
+				<li><a href="https://netnewswire.com" target="_blank" rel="noopener">NetNewsWire</a> — macOS / iOS, free and open source</li>
+				<li><a href="https://inoreader.com" target="_blank" rel="noopener">Inoreader</a> — web + apps, generous free tier</li>
+				<li><a href="https://reederapp.com" target="_blank" rel="noopener">Reeder</a> — paid, polished native apps</li>
+			</ul>
+
+			<h2>What's in the feed</h2>
+			<p>
+				All blog posts and projects, sorted by publish date. Drafts and unpublished entries are excluded.
+			</p>
+
+			<p>
+				<a href="/">← Back to recent sessions</a>
+			</p>
+		</Prose>
+	</article>
+</Layout>

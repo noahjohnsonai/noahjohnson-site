@@ -1,0 +1,32 @@
+---
+// Top-level sidebar group ("Posts", "Projects", "About"). Collapsible via <details>.
+interface Props {
+	label: string;
+	defaultOpen?: boolean;
+}
+const { label, defaultOpen = true } = Astro.props;
+---
+
+<details class="group/grp mt-4" open={defaultOpen}>
+	<summary class="flex items-center justify-between px-3 py-1.5 mx-2 text-[11px] uppercase tracking-wider text-fg-muted hover:text-fg cursor-pointer select-none rounded-md list-none">
+		<span class="font-semibold">{label}</span>
+		<svg
+			width="12"
+			height="12"
+			viewBox="0 0 12 12"
+			fill="none"
+			class="shrink-0 transition-transform group-open/grp:rotate-90"
+			aria-hidden="true"
+		>
+			<path d="M4 3L8 6L4 9" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+		</svg>
+	</summary>
+	<div class="mt-1">
+		<slot />
+	</div>
+</details>
+
+<style>
+	summary::-webkit-details-marker { display: none; }
+	summary::marker { content: ""; }
+</style>
