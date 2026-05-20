@@ -1,0 +1,90 @@
+---
+import { getCollection } from 'astro:content';
+import Layout from '../../layouts/Layout.astro';
+import { formatRelativeDate } from '../../lib/data.ts';
+
+export async function getStaticPaths() {
+	const posts = await getCollection('posts', ({ data }) => !data.draft);
+	const projects = await getCollection('projects', ({ data }) => !data.draft);
+	const all = [...posts, ...projects];
+
+	const tagSet = new Set<string>();
+	for (const entry of all) {
+		for (const t of entry.data.tags ?? []) tagSet.add(t);
+	}
+
+	return [...tagSet].map((tag) => {
+		const entries = all
+			.filter((e) => (e.data.tags ?? []).includes(tag))
+			.sort(
+				(a, b) =>
+					(b.data.pubDate?.getTime() ?? 0) - (a.data.pubDate?.getTime() ?? 0),
+			);
+		return { params: { tag }, props: { tag, entries } };
+	});
+}
+
+const { tag, entries } = Astro.props;
+
+const breadcrumbs = [
+	{ label: 'noahjohnson.ai', href: '/' },
+	{ label: 'Tags', href: '/tags/' },
+	{ label: `#${tag}` },
+];
+---
+
+<Layout
+	title={`#${tag}`}
+	description={`Posts and projects tagged ${tag} on noahjohnson.ai.`}
+	breadcrumbs={breadcrumbs}
+	rawMarkdown=""
+	rawFilename=""
+>
+	<article>
+		<header class="mb-8">
+			<h1 class="text-2xl sm:text-3xl font-semibold tracking-tight text-fg leading-tight m-0 mb-2 font-mono">
+				<span class="text-fg-dim">#</span>{tag}
+			</h1>
+			<p class="text-fg-muted text-sm m-0">
+				{entries.length} {entries.length === 1 ? 'entry' : 'entries'} tagged with this.
+			</p>
+		</header>
+
+		<ul class="list-none p-0 m-0 flex flex-col gap-3">
+			{
+				entries.map((entry) => {
+					const href = `/${entry.collection}/${entry.id}/`;
+					const collectionLabel = entry.collection === 'projects' ? 'Project' : 'Post';
+					return (
+						<li>
+							<a
+								href={href}
+								class="block px-4 py-3 rounded-lg bg-surface border border-border-soft hover:bg-surface-hover hover:border-border no-underline transition-colors"
+							>
+								<div class="flex items-baseline justify-between gap-3 mb-1">
+									<span class="text-fg font-medium">{entry.data.title}</span>
+									<span class="text-xs text-fg-dim shrink-0">
+										{collectionLabel}
+										{entry.data.pubDate && (
+											<>
+												{' · '}
+												{formatRelativeDate(entry.data.pubDate)}
+											</>
+										)}
+									</span>
+								</div>
+								{entry.data.description && (
+									<p class="text-fg-muted text-sm m-0">{entry.data.description}</p>
+								)}
+							</a>
+						</li>
+					);
+				})
+			}
+		</ul>
+
+		<div class="mt-8 pt-4 border-t border-border-soft">
+			<a href="/tags/" class="text-fg-muted hover:text-accent no-underline text-sm">← Back to all tags</a>
+		</div>
+	</article>
+</Layout>

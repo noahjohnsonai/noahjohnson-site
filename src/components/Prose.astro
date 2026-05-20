@@ -1,20 +1,26 @@
 ---
 // Wraps post body with typography styles matched to Claude Code's reading vibe.
 // Tailwind 4 + custom selectors on the rendered HTML.
+//
+// IMPORTANT: this <style> block is `is:global` rather than scoped. Astro's
+// ClientRouter (view transitions) was inconsistently re-attaching the scoped
+// `.prose[data-astro-cid-xxx]` stylesheet across navigations, which caused
+// the body width to flicker between 70ch and 100% depending on entry path.
+// Going global makes the rule selector-stable and order-independent.
 ---
 
 <div class="prose">
 	<slot />
 </div>
 
-<style>
+<style is:global>
 	.prose {
-		max-width: 70ch;
+		max-width: 100%;
 		color: var(--color-fg);
 		font-size: 1rem;
 		line-height: 1.7;
 	}
-	.prose :global(h1) {
+	.prose h1 {
 		font-family: var(--font-sans);
 		font-size: 1.875rem;
 		font-weight: 600;
@@ -23,7 +29,7 @@
 		margin: 0 0 0.75em;
 		letter-spacing: -0.01em;
 	}
-	.prose :global(h2) {
+	.prose h2 {
 		font-family: var(--font-sans);
 		font-size: 1.375rem;
 		font-weight: 600;
@@ -32,59 +38,59 @@
 		margin: 2em 0 0.6em;
 		letter-spacing: -0.01em;
 	}
-	.prose :global(h3) {
+	.prose h3 {
 		font-family: var(--font-sans);
 		font-size: 1.125rem;
 		font-weight: 600;
 		color: var(--color-fg);
 		margin: 1.5em 0 0.5em;
 	}
-	.prose :global(h4),
-	.prose :global(h5),
-	.prose :global(h6) {
+	.prose h4,
+	.prose h5,
+	.prose h6 {
 		font-weight: 600;
 		color: var(--color-fg);
 		margin: 1.25em 0 0.5em;
 	}
-	.prose :global(p) {
+	.prose p {
 		margin: 0 0 1.1em;
 	}
-	.prose :global(a) {
+	.prose a {
 		color: var(--color-accent);
 		text-decoration: underline;
 		text-underline-offset: 3px;
 		text-decoration-color: var(--color-accent-dim);
 	}
-	.prose :global(a:hover) {
+	.prose a:hover {
 		text-decoration-color: var(--color-accent);
 	}
-	.prose :global(strong) {
+	.prose strong {
 		color: var(--color-fg);
 		font-weight: 600;
 	}
-	.prose :global(em) {
+	.prose em {
 		color: var(--color-fg);
 		font-style: italic;
 	}
-	.prose :global(blockquote) {
+	.prose blockquote {
 		border-left: 3px solid var(--color-accent);
 		padding-left: 1em;
 		margin: 1.5em 0;
 		color: var(--color-fg-muted);
 		font-style: normal;
 	}
-	.prose :global(ul),
-	.prose :global(ol) {
+	.prose ul,
+	.prose ol {
 		margin: 0 0 1.1em;
 		padding-left: 1.5em;
 	}
-	.prose :global(li) {
+	.prose li {
 		margin: 0.3em 0;
 	}
-	.prose :global(li::marker) {
+	.prose li::marker {
 		color: var(--color-fg-dim);
 	}
-	.prose :global(code) {
+	.prose code {
 		font-family: var(--font-mono);
 		font-size: 0.875em;
 		background: var(--color-surface);
@@ -93,7 +99,7 @@
 		border-radius: 4px;
 		border: 1px solid var(--color-border-soft);
 	}
-	.prose :global(pre) {
+	.prose pre {
 		font-family: var(--font-mono);
 		font-size: 0.85em;
 		background: var(--color-bg-elevated);
@@ -104,18 +110,18 @@
 		margin: 1.5em 0;
 		line-height: 1.6;
 	}
-	.prose :global(pre code) {
+	.prose pre code {
 		background: transparent;
 		border: none;
 		padding: 0;
 		font-size: inherit;
 	}
-	.prose :global(hr) {
+	.prose hr {
 		border: none;
 		border-top: 1px solid var(--color-border);
 		margin: 2em 0;
 	}
-	.prose :global(img) {
+	.prose img {
 		max-width: 100%;
 		height: auto;
 		border-radius: 10px;
@@ -123,23 +129,41 @@
 		margin: 1.5em 0;
 		box-shadow: 0 8px 32px -16px rgba(0, 0, 0, 0.6);
 	}
-	.prose :global(table) {
+	.prose table {
 		border-collapse: collapse;
 		width: 100%;
 		margin: 1.5em 0;
 		font-size: 0.9em;
 	}
-	.prose :global(th),
-	.prose :global(td) {
+	.prose th,
+	.prose td {
 		text-align: left;
 		padding: 0.5em 0.8em;
 		border-bottom: 1px solid var(--color-border-soft);
 	}
-	.prose :global(th) {
+	.prose th {
 		color: var(--color-fg);
 		font-weight: 600;
 	}
-	.prose :global(td) {
+	.prose td {
 		color: var(--color-fg-muted);
+	}
+
+	/* Project-page thumbnail size override.
+	   Higher specificity than `.prose img` above so it wins inside the
+	   project content wrapper. */
+	.prose .project-content.project-content img {
+		max-width: 240px;
+		width: auto;
+		height: auto;
+		display: block;
+		margin: 1.25em 0;
+		box-shadow: 0 4px 16px -8px rgba(0, 0, 0, 0.5);
+		transition: border-color 150ms ease, transform 150ms ease;
+		cursor: pointer;
+	}
+	.prose .project-content.project-content img:hover {
+		border-color: var(--color-border);
+		transform: translateY(-1px);
 	}
 </style>

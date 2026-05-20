@@ -17,9 +17,13 @@ const posts = defineCollection({
 	schema: postSchema,
 });
 
+const projectSchema = postSchema.extend({
+	skills: z.array(z.string()).default([]),
+});
+
 const projects = defineCollection({
 	loader: glob({ base: './src/content/projects', pattern: '**/*.{md,mdx}' }),
-	schema: postSchema,
+	schema: projectSchema,
 });
 
 const about = defineCollection({

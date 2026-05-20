@@ -74,7 +74,7 @@ const recentEntries = [...recentPosts, ...recentProjects];
 	{/* Image lightbox overlay — populated by JS on click of any .prose img */}
 	<div
 		id="lightbox"
-		class="fixed inset-0 z-[60] hidden items-center justify-center p-6 bg-bg/95 cursor-zoom-out"
+		class="fixed inset-0 z-[60] hidden items-center justify-center p-6 bg-bg/95"
 		role="dialog"
 		aria-modal="true"
 		aria-hidden="true"
@@ -491,7 +491,7 @@ const recentEntries = [...recentPosts, ...recentProjects];
 					const el = img as HTMLImageElement;
 					if (el.dataset.lbInit) return;
 					el.dataset.lbInit = '1';
-					el.style.cursor = 'zoom-in';
+					el.style.cursor = 'pointer';
 					el.addEventListener('click', () => openLightbox(el.src, el.alt));
 				});
 			})();

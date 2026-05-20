@@ -1,7 +1,7 @@
 ---
 import Layout from './Layout.astro';
 import Prose from '../components/Prose.astro';
-import { formatAbsoluteDate } from '../lib/data.ts';
+import { formatAbsoluteDate, formatMonthYear } from '../lib/data.ts';
 
 interface Props {
 	title: string;
@@ -13,6 +13,7 @@ interface Props {
 	collectionHref: string;  // "/posts" | "/projects" | "/about"
 	rawMarkdown: string;
 	rawFilename: string;
+	dateFormat?: 'full' | 'month-year';
 }
 const {
 	title,
@@ -24,7 +25,10 @@ const {
 	collectionHref,
 	rawMarkdown,
 	rawFilename,
+	dateFormat = 'full',
 } = Astro.props;
+
+const fmt = dateFormat === 'month-year' ? formatMonthYear : formatAbsoluteDate;
 
 const breadcrumbs =
 	collectionLabel === title
@@ -55,13 +59,13 @@ const breadcrumbs =
 			<div class="flex flex-wrap items-center gap-x-3 gap-y-2 text-xs text-fg-dim">
 				{pubDate && (
 					<time datetime={pubDate.toISOString()}>
-						{formatAbsoluteDate(pubDate)}
+						{fmt(pubDate)}
 					</time>
 				)}
 				{updatedDate && (
 					<>
 						<span>•</span>
-						<span>updated <time datetime={updatedDate.toISOString()}>{formatAbsoluteDate(updatedDate)}</time></span>
+						<span>updated <time datetime={updatedDate.toISOString()}>{fmt(updatedDate)}</time></span>
 					</>
 				)}
 				{tags.length > 0 && (
@@ -70,9 +74,12 @@ const breadcrumbs =
 						<ul class="inline-flex flex-wrap gap-1.5 m-0 p-0 list-none">
 							{tags.map((t) => (
 								<li class="inline-block">
-									<span class="inline-block text-xs text-fg-muted font-mono px-1.5 py-0.5 rounded bg-surface border border-border-soft">
+									<a
+										href={`/tags/${encodeURIComponent(t)}/`}
+										class="inline-block text-xs text-fg-muted hover:text-fg font-mono px-1.5 py-0.5 rounded bg-surface border border-border-soft hover:border-border no-underline transition-colors"
+									>
 										{t}
-									</span>
+									</a>
 								</li>
 							))}
 						</ul>
@@ -80,8 +87,10 @@ const breadcrumbs =
 				)}
 			</div>
 		</header>
+		<slot name="belowHeader" />
 		<Prose>
 			<slot />
 		</Prose>
+		<slot name="after" />
 	</article>
 </Layout>

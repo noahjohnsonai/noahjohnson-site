@@ -1,0 +1,52 @@
+---
+import { getCollection } from 'astro:content';
+
+// Aggregate tag counts across posts + projects (drafts excluded).
+const posts = await getCollection('posts', ({ data }) => !data.draft);
+const projects = await getCollection('projects', ({ data }) => !data.draft);
+
+const counts = new Map<string, number>();
+for (const entry of [...posts, ...projects]) {
+	for (const tag of entry.data.tags ?? []) {
+		counts.set(tag, (counts.get(tag) ?? 0) + 1);
+	}
+}
+
+// Sort by count desc, then alphabetical for ties.
+const sorted = [...counts.entries()].sort(
+	(a, b) => b[1] - a[1] || a[0].localeCompare(b[0]),
+);
+
+// Map count → font-size in rem so big tags read bigger.
+const maxCount = Math.max(1, ...counts.values());
+const minCount = Math.min(1, ...counts.values());
+const MIN_REM = 0.8;
+const MAX_REM = 1.6;
+
+function sizeFor(count: number): number {
+	if (maxCount === minCount) return (MIN_REM + MAX_REM) / 2;
+	const t = (count - minCount) / (maxCount - minCount);
+	return MIN_REM + t * (MAX_REM - MIN_REM);
+}
+---
+
+{
+	sorted.length === 0 ? (
+		<p class="text-fg-dim text-sm m-0">No tags yet.</p>
+	) : (
+		<ul class="flex flex-wrap gap-x-3 gap-y-2 list-none p-0 m-0 items-baseline">
+			{sorted.map(([tag, count]) => (
+				<li class="inline-block leading-none">
+					<a
+						href={`/tags/${encodeURIComponent(tag)}/`}
+						class="font-mono text-fg-muted hover:text-accent transition-colors no-underline"
+						style={`font-size: ${sizeFor(count)}rem;`}
+						title={`${count} ${count === 1 ? 'entry' : 'entries'}`}
+					>
+						{tag}
+					</a>
+				</li>
+			))}
+		</ul>
+	)
+}

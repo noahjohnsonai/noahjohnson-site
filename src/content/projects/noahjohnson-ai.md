@@ -3,11 +3,27 @@ title: noahjohnson.ai
 description: A personal blog and portfolio built as a faithful tribute to the Claude Code desktop UI.
 pubDate: 2026-05-19
 tags:
-  - astro
-  - tailwind
+  - portfolio
+  - personal-site
   - design
+  - case-study
+  - ai-augmented
   - claude-code
+  - astro
+  - view-transitions
+  - tailwind
+  - pagefind
+  - geist
+  - vercel
 featured: true
+skills:
+  - claude-code
+  - astro
+  - tailwindcss
+  - typescript
+  - vercel
+  - pnpm
+  - github
 ---
 
 ![noahjohnson.ai home page — Claude Code-inspired UI with sidebar of session-style entries, welcome hero, session cards, and the bike mascot above the search bar.](/projects/noahjohnson-ai-cover.png)
@@ -43,7 +59,9 @@ It also became the first real test of a workflow I want to write about: pair-pro
 
 ## Source
 
-[github.com/noahjohnsonai/noahjohnson-site](https://github.com/noahjohnsonai/noahjohnson-site) — MIT.
+[github.com/noahjohnsonai/noahjohnson-site](https://github.com/noahjohnsonai/noahjohnson-site)
+
+The code and content here are © Noah Johnson. All rights reserved. You're welcome to read, link, and share excerpts with attribution. Any other use — copying, modifying, redistributing, or building on this work, commercially or otherwise — requires written permission. Reach out at [noah@noahjohnson.ai](mailto:noah@noahjohnson.ai).
 
 ## Case study coming
 

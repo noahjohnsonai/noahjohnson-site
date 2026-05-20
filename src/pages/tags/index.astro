@@ -1,0 +1,29 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import TagCloud from '../../components/TagCloud.astro';
+
+const breadcrumbs = [
+	{ label: 'noahjohnson.ai', href: '/' },
+	{ label: 'Tags' },
+];
+---
+
+<Layout
+	title="Tags"
+	description="Every tag used across posts and projects on noahjohnson.ai."
+	breadcrumbs={breadcrumbs}
+	rawMarkdown=""
+	rawFilename=""
+>
+	<article>
+		<header class="mb-8">
+			<h1 class="text-2xl sm:text-3xl font-semibold tracking-tight text-fg leading-tight m-0 mb-2">
+				Tags
+			</h1>
+			<p class="text-fg-muted text-base m-0">
+				Every tag used across posts and projects. Sized by how often it appears.
+			</p>
+		</header>
+		<TagCloud />
+	</article>
+</Layout>

@@ -1,0 +1,55 @@
+---
+title: Conversational AI Client-Intake Agent
+description: A hybrid-conversational AI agent that replaces manual pre-engagement client intake.
+pubDate: 2026-05-05
+tags:
+  - ai-agent
+  - llm
+  - magic-link-auth
+  - prompt-injection-hardening
+  - zero-data-retention
+  - building-in-public
+  - ai-augmented
+  - claude-code
+  - nextjs
+  - typescript
+  - tailwind
+  - shadcn-ui
+  - supabase
+  - postgres
+  - anthropic
+  - resend
+  - upstash
+  - vercel
+  - vitest
+  - playwright
+  - lefthook
+  - biome
+featured: false
+skills:
+  - claude-code
+  - nextjs
+  - typescript
+  - tailwindcss
+  - supabase
+  - postgres
+  - vercel
+  - vitest
+  - github
+---
+
+## What
+
+A hybrid-conversational AI agent for pre-engagement client intake. Inbound clients receive a magic link, walk through a guided multi-session intake, and the engagement team receives a structured discovery brief by email when everyone has finished.
+
+## Why
+
+Pre-engagement intake is the single most expensive thing a service business does badly. Static questionnaires don't probe; humans who probe in person don't scale; the cost gets paid in either lost revenue or unbillable scoping calls. A conversational agent that can pull on threads and produce a brief in the team's own shape removes a large amount of manual ceremony without putting any actual decisions in the agent's hands.
+
+## Stack at a glance
+
+Next.js (App Router) · TypeScript · Tailwind · shadcn/ui · Supabase (Postgres, Auth, Storage) · Anthropic Claude via the Zero Data Retention endpoint · Resend · Upstash Ratelimit · Vercel · Vitest · Playwright · Lefthook · Biome.
+
+## How it's built
+
+Built with Claude Code under a four-agent governance harness — PM, backend, frontend, trust-ops — with a hard-rule set focused on security posture: server-authoritative session state, no PII in URLs, no in-chat brief rendering, an invisible system prompt, user input treated as data and never as instruction, ZDR-tier required on the model endpoint. All firm-identity strings flow through a single brand config so the same codebase can be re-skinned cleanly.

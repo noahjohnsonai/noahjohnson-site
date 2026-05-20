@@ -1,0 +1,169 @@
+---
+// Marquee of skill icons, sourced from skillicons.dev.
+// Inspired by github.com/Dnzzk2/Litos (src/components/base/SkillsShowcase.astro).
+
+type SkillInput = string | { slug: string; name?: string; url?: string };
+export type SkillRow = { direction?: 'left' | 'right'; skills: SkillInput[] };
+
+interface Props {
+	rows: SkillRow[];
+	duration?: number;
+}
+
+const { rows, duration = 30 } = Astro.props;
+
+// Slugs whose icons aren't on skillicons.dev — served from /public/icons/.
+const CUSTOM_ICONS: Record<string, string> = {
+	claude: '/icons/claude.svg',
+	'claude-code': '/icons/claude.svg',
+	anthropic: '/icons/claude.svg',
+};
+
+const NAME_MAP: Record<string, string> = {
+	claude: 'Claude',
+	'claude-code': 'Claude Code',
+	anthropic: 'Anthropic',
+	astro: 'Astro',
+	tailwindcss: 'Tailwind CSS',
+	tailwind: 'Tailwind CSS',
+	typescript: 'TypeScript',
+	ts: 'TypeScript',
+	javascript: 'JavaScript',
+	js: 'JavaScript',
+	html: 'HTML',
+	css: 'CSS',
+	nodejs: 'Node.js',
+	vercel: 'Vercel',
+	github: 'GitHub',
+	git: 'Git',
+	vscode: 'VS Code',
+	md: 'Markdown',
+	markdown: 'Markdown',
+	bash: 'Bash',
+	linux: 'Linux',
+	pnpm: 'pnpm',
+	npm: 'npm',
+	figma: 'Figma',
+	react: 'React',
+	nextjs: 'Next.js',
+	vue: 'Vue',
+	sass: 'Sass',
+	mongodb: 'MongoDB',
+	obsidian: 'Obsidian',
+	ubuntu: 'Ubuntu',
+	vite: 'Vite',
+	regex: 'Regex',
+	cloudflare: 'Cloudflare',
+	docker: 'Docker',
+	postman: 'Postman',
+	notion: 'Notion',
+	bun: 'Bun',
+	threejs: 'Three.js',
+	postgres: 'Postgres',
+	postgresql: 'Postgres',
+	supabase: 'Supabase',
+	vitest: 'Vitest',
+	playwright: 'Playwright',
+	sentry: 'Sentry',
+	godot: 'Godot',
+	biome: 'Biome',
+};
+
+function normalize(input: SkillInput) {
+	if (typeof input === 'string') {
+		return {
+			slug: input,
+			name: NAME_MAP[input] ?? input.charAt(0).toUpperCase() + input.slice(1),
+			url: undefined as string | undefined,
+		};
+	}
+	return {
+		slug: input.slug,
+		name: input.name ?? NAME_MAP[input.slug] ?? input.slug,
+		url: input.url,
+	};
+}
+
+const normalized = rows.map((r) => ({
+	direction: r.direction ?? 'left',
+	skills: r.skills.map(normalize),
+}));
+
+const dup = <T,>(arr: T[]) => [...arr, ...arr, ...arr, ...arr];
+---
+
+<div class="skills-marquee relative my-6 py-2">
+	{normalized.map((row) => (
+		<div class="relative w-full overflow-hidden my-2 group">
+			<div
+				class:list={[
+					'flex w-max will-change-transform',
+					row.direction === 'right' ? 'animate-marquee-reverse' : 'animate-marquee',
+					'group-hover:[animation-play-state:paused]',
+				]}
+				style={`animation-duration: ${duration}s;`}
+			>
+				{dup(row.skills).map((skill) => {
+					const Tag = (skill.url ? 'a' : 'div') as any;
+					const tagProps = skill.url
+						? { href: skill.url, target: '_blank', rel: 'noopener noreferrer' }
+						: {};
+					return (
+						<div class="skill-card mx-1.5">
+							<Tag
+								class="flex items-center gap-2 px-3 py-1.5 whitespace-nowrap transition-colors duration-150"
+								{...tagProps}
+							>
+								<img
+									src={CUSTOM_ICONS[skill.slug] ?? `https://skillicons.dev/icons?i=${skill.slug}`}
+									alt=""
+									aria-hidden="true"
+									width="20"
+									height="20"
+									loading="lazy"
+									decoding="async"
+									class="w-5 h-5 block"
+								/>
+								<span class="font-sans text-sm font-medium text-fg">{skill.name}</span>
+							</Tag>
+						</div>
+					);
+				})}
+			</div>
+		</div>
+	))}
+
+	<div class="pointer-events-none absolute left-0 top-0 w-[10%] h-full bg-gradient-to-r from-bg to-transparent z-10"></div>
+	<div class="pointer-events-none absolute right-0 top-0 w-[10%] h-full bg-gradient-to-l from-bg to-transparent z-10"></div>
+</div>
+
+<style>
+	@keyframes marquee {
+		0% { transform: translate3d(0, 0, 0); }
+		100% { transform: translate3d(-25%, 0, 0); }
+	}
+	@keyframes marquee-reverse {
+		0% { transform: translate3d(-25%, 0, 0); }
+		100% { transform: translate3d(0, 0, 0); }
+	}
+	.animate-marquee { animation: marquee linear infinite; }
+	.animate-marquee-reverse { animation: marquee-reverse linear infinite; }
+
+	.skill-card {
+		border-radius: 0.5rem;
+		background-color: var(--color-surface);
+		border: 1px solid var(--color-border-soft);
+		transition: background-color 0.15s, border-color 0.15s;
+	}
+	.skill-card:hover {
+		background-color: var(--color-surface-hover);
+		border-color: var(--color-border);
+	}
+
+	@media (prefers-reduced-motion: reduce) {
+		.animate-marquee,
+		.animate-marquee-reverse {
+			animation: none;
+		}
+	}
+</style>

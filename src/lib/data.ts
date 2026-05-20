@@ -49,3 +49,10 @@ export function formatAbsoluteDate(date: Date): string {
 		day: 'numeric',
 	});
 }
+
+export function formatMonthYear(date: Date): string {
+	return date.toLocaleDateString('en-US', {
+		year: 'numeric',
+		month: 'long',
+	});
+}

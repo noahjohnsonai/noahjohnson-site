@@ -1,12 +1,40 @@
 ---
 import { getEntry, render } from 'astro:content';
 import PostLayout from '../layouts/PostLayout.astro';
+import SkillsShowcase from '../components/SkillsShowcase.astro';
+import TagCloud from '../components/TagCloud.astro';
 
 const entry = await getEntry('about', 'about');
 if (!entry) {
 	throw new Error('Missing about.md content at src/content/about/about.md');
 }
 const { Content } = await render(entry);
+
+// Union of every slug used across project-page marquees, organized into
+// 5 rows that alternate direction. Keep this in sync when new tech lands
+// in a project's `skills` frontmatter.
+const skillRows = [
+	{
+		direction: 'left' as const,
+		skills: ['astro', 'nextjs', 'react', 'typescript', 'javascript', 'html'],
+	},
+	{
+		direction: 'right' as const,
+		skills: ['css', 'tailwindcss', 'sass', 'threejs', 'vite', 'vitest'],
+	},
+	{
+		direction: 'left' as const,
+		skills: ['claude-code', 'nodejs', 'bun', 'supabase', 'postgres', 'godot'],
+	},
+	{
+		direction: 'right' as const,
+		skills: ['vercel', 'docker', 'sentry', 'biome', 'github', 'git'],
+	},
+	{
+		direction: 'left' as const,
+		skills: ['vscode', 'bash', 'linux', 'pnpm', 'regex', 'markdown'],
+	},
+];
 ---
 
 <PostLayout
@@ -18,4 +46,16 @@ const { Content } = await render(entry);
 	rawFilename="about.md"
 >
 	<Content />
+	<section slot="after" class="mt-10" aria-labelledby="skills-heading">
+		<h2 id="skills-heading" class="text-xl font-semibold tracking-tight text-fg m-0 mb-1">Skills</h2>
+		<p class="text-fg-muted text-sm m-0">It's not just skills, but also tools:</p>
+		<SkillsShowcase rows={skillRows} />
+	</section>
+	<section slot="after" class="mt-10" aria-labelledby="tags-heading">
+		<h2 id="tags-heading" class="text-xl font-semibold tracking-tight text-fg m-0 mb-1">Tags</h2>
+		<p class="text-fg-muted text-sm m-0 mb-4">
+			Everything I've written or built, clustered by topic. Bigger = more.
+		</p>
+		<TagCloud />
+	</section>
 </PostLayout>

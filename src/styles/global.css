@@ -86,6 +86,12 @@ button, a {
 	transition: color 120ms ease, background-color 120ms ease, border-color 120ms ease;
 }
 
+/* Project-page image thumbnail rule lives in src/pages/projects/[...slug].astro
+   as a per-route <style is:global>. It is intentionally NOT here because the
+   ClientRouter (view transitions) drops global.css's rule on client-side nav,
+   so the rule was only winning on hard loads. Per-route style tags get
+   swapped in correctly during transitions. */
+
 /* Centered content column that scales across all viewport sizes.
    Tailwind's @theme breakpoint ordering doesn't reliably sort custom
    breakpoints alongside built-in ones, so we use hand-written media
