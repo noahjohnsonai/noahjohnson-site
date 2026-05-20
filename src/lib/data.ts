@@ -16,6 +16,99 @@ export async function getSortedProjects(): Promise<CollectionEntry<'projects'>[]
 	);
 }
 
+export async function getSortedCaseStudies(): Promise<CollectionEntry<'caseStudies'>[]> {
+	const all = await getCollection('caseStudies', ({ data }) => !data.draft);
+	return all.sort(
+		(a, b) => b.data.pubDate.getTime() - a.data.pubDate.getTime(),
+	);
+}
+
+// Enforce 1:1 case-study↔project mapping (plan decision row 10). Throws at
+// build time if two case studies share a `project:` slug, or if a case study
+// points at a non-existent project. Called from case-studies routes.
+export async function assertCaseStudyInvariants(): Promise<void> {
+	const [caseStudies, projects] = await Promise.all([
+		getCollection('caseStudies'),
+		getCollection('projects'),
+	]);
+	const projectIds = new Set(projects.map((p) => p.id));
+	const seen = new Map<string, string>(); // project slug -> case-study id
+	for (const cs of caseStudies) {
+		const proj = cs.data.project;
+		if (!projectIds.has(proj)) {
+			throw new Error(
+				`Case study "${cs.id}" references project "${proj}", which doesn't exist in src/content/projects/. ` +
+				`Either create the project or fix the case study's frontmatter.`,
+			);
+		}
+		const prev = seen.get(proj);
+		if (prev) {
+			throw new Error(
+				`Two case studies reference the same project "${proj}": "${prev}" and "${cs.id}". ` +
+				`Case studies must be 1:1 with projects — merge or remove one.`,
+			);
+		}
+		seen.set(proj, cs.id);
+	}
+}
+
+// Get the case study for a project slug, or null if none exists. Used by
+// the project page to render the cross-link chip.
+export async function getCaseStudyForProject(
+	projectSlug: string,
+): Promise<CollectionEntry<'caseStudies'> | null> {
+	const all = await getCollection('caseStudies', ({ data }) => !data.draft);
+	return all.find((cs) => cs.data.project === projectSlug) ?? null;
+}
+
+export interface ResolvedExample {
+	slug: string;
+	title: string;
+	filename: string;
+	content: string;
+	href: string;
+}
+
+// Scan markdown body for inline links to /examples/<slug> and return the
+// referenced example entries in the order they appear. Each result includes
+// the example's body so the RightPanel can render it without a network call.
+// Powers the "drawer defaults to first linked example" behavior (plan
+// decision row 13).
+export async function getReferencedExamples(
+	body: string,
+): Promise<ResolvedExample[]> {
+	if (!body) return [];
+	// Match [text](/examples/<slug>) or [text](/examples/<slug>/) — leading
+	// slash required to disambiguate from relative paths. Capture the slug.
+	const re = /\]\(\/examples\/([a-z0-9-]+)\/?\)/gi;
+	const slugs: string[] = [];
+	const seen = new Set<string>();
+	let m: RegExpExecArray | null;
+	while ((m = re.exec(body)) !== null) {
+		const slug = m[1];
+		if (!seen.has(slug)) {
+			seen.add(slug);
+			slugs.push(slug);
+		}
+	}
+	if (slugs.length === 0) return [];
+	const all = await getCollection('examples');
+	const byId = new Map(all.map((e) => [e.id, e]));
+	const resolved: ResolvedExample[] = [];
+	for (const slug of slugs) {
+		const entry = byId.get(slug);
+		if (!entry) continue; // silently skip dangling references
+		resolved.push({
+			slug,
+			title: entry.data.title,
+			filename: `${entry.id}.md`,
+			content: entry.body ?? '',
+			href: `/examples/${entry.id}/`,
+		});
+	}
+	return resolved;
+}
+
 export function groupByYear<T extends PostEntry>(
 	entries: T[],
 ): { year: number; entries: T[] }[] {

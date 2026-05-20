@@ -1,5 +1,5 @@
 ---
-import { getSortedPosts, getSortedProjects } from '../lib/data.ts';
+import { getSortedPosts, getSortedProjects, getSortedCaseStudies } from '../lib/data.ts';
 import SidebarGroup from './SidebarGroup.astro';
 import SidebarItem from './SidebarItem.astro';
 import UserCard from './UserCard.astro';
@@ -9,6 +9,7 @@ const currentPath = Astro.url.pathname.replace(/\/$/, '') || '/';
 
 const posts = await getSortedPosts();
 const projects = await getSortedProjects();
+const caseStudies = await getSortedCaseStudies();
 
 const aboutActive = currentPath === '/about';
 ---
@@ -80,6 +81,24 @@ const aboutActive = currentPath === '/about';
 							title={entry.data.title}
 							slug={`projects/${entry.id}`}
 							active={currentPath === `/projects/${entry.id}`}
+							featured={entry.data.featured}
+						/>
+					))}
+				</ul>
+			)}
+		</SidebarGroup>
+
+		<SidebarGroup label="Case Studies" defaultOpen={true}>
+			{caseStudies.length === 0 ? (
+				<p class="text-xs text-fg-dim italic mx-5 my-2">No case studies yet.</p>
+			) : (
+				<ul class="px-0">
+					{caseStudies.map((entry) => (
+						<SidebarItem
+							href={`/case-studies/${entry.id}/`}
+							title={entry.data.title}
+							slug={`case-studies/${entry.id}`}
+							active={currentPath === `/case-studies/${entry.id}`}
 							featured={entry.data.featured}
 						/>
 					))}

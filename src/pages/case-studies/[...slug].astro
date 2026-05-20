@@ -1,11 +1,12 @@
 ---
 import { getCollection, render } from 'astro:content';
 import PostLayout from '../../layouts/PostLayout.astro';
-import { getReferencedExamples } from '../../lib/data.ts';
+import { assertCaseStudyInvariants, getReferencedExamples } from '../../lib/data.ts';
 
 export async function getStaticPaths() {
-	const posts = await getCollection('posts', ({ data }) => !data.draft);
-	return posts.map((entry) => ({
+	await assertCaseStudyInvariants();
+	const studies = await getCollection('caseStudies', ({ data }) => !data.draft);
+	return studies.map((entry) => ({
 		params: { slug: entry.id },
 		props: { entry },
 	}));
@@ -22,11 +23,23 @@ const examples = await getReferencedExamples(entry.body ?? '');
 	pubDate={entry.data.pubDate}
 	updatedDate={entry.data.updatedDate}
 	tags={entry.data.tags}
-	collectionLabel="Posts"
-	collectionHref="/"
+	collectionLabel="Case Studies"
+	collectionHref="/case-studies/"
 	rawMarkdown={entry.body ?? ''}
 	rawFilename={`${entry.id}.md`}
 	examples={examples}
 >
-	<Content />
+	<div class="project-content">
+		<Content />
+	</div>
+	<aside slot="after" class="mt-10 pt-6 border-t border-border-soft text-sm text-fg-muted">
+		Paired with project:
+		{' '}
+		<a
+			href={`/projects/${entry.data.project}/`}
+			class="text-accent hover:underline"
+		>
+			{entry.data.project}
+		</a>
+	</aside>
 </PostLayout>

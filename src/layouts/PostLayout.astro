@@ -3,6 +3,13 @@ import Layout from './Layout.astro';
 import Prose from '../components/Prose.astro';
 import { formatAbsoluteDate, formatMonthYear } from '../lib/data.ts';
 
+interface ExampleRef {
+	slug: string;
+	title: string;
+	filename: string;
+	content: string;
+	href: string;
+}
 interface Props {
 	title: string;
 	description?: string;
@@ -13,6 +20,7 @@ interface Props {
 	collectionHref: string;  // "/posts" | "/projects" | "/about"
 	rawMarkdown: string;
 	rawFilename: string;
+	examples?: ExampleRef[];
 	dateFormat?: 'full' | 'month-year';
 }
 const {
@@ -25,6 +33,7 @@ const {
 	collectionHref,
 	rawMarkdown,
 	rawFilename,
+	examples = [],
 	dateFormat = 'full',
 } = Astro.props;
 
@@ -47,6 +56,7 @@ const breadcrumbs =
 	breadcrumbs={breadcrumbs}
 	rawMarkdown={rawMarkdown}
 	rawFilename={rawFilename}
+	examples={examples}
 >
 	<article>
 		<header class="mb-8">

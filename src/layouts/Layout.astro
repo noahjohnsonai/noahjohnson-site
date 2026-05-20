@@ -12,6 +12,13 @@ interface Crumb {
 	label: string;
 	href?: string;
 }
+interface ExampleRef {
+	slug: string;
+	title: string;
+	filename: string;
+	content: string;
+	href: string;
+}
 interface Props {
 	title?: string;
 	description?: string;
@@ -20,6 +27,7 @@ interface Props {
 	breadcrumbs: Crumb[];
 	rawMarkdown?: string;
 	rawFilename?: string;
+	examples?: ExampleRef[];
 }
 const {
 	title,
@@ -29,6 +37,7 @@ const {
 	breadcrumbs,
 	rawMarkdown,
 	rawFilename,
+	examples = [],
 } = Astro.props;
 
 // Recent items shown in the search overlay's default empty state.
@@ -68,7 +77,7 @@ const recentEntries = [...recentPosts, ...recentProjects];
 			<SearchOverlay recentEntries={recentEntries} />
 		</div>
 
-		<RightPanel rawMarkdown={rawMarkdown} filename={rawFilename} />
+		<RightPanel rawMarkdown={rawMarkdown} filename={rawFilename} examples={examples} />
 	</div>
 
 	{/* Image lightbox overlay — populated by JS on click of any .prose img */}
@@ -140,30 +149,117 @@ const recentEntries = [...recentPosts, ...recentProjects];
 			// --- Right panel content tracking ---
 			// Each page that has markdown content includes a hidden
 			// <script id="rp-page-data" type="application/json"> with
-			// {filename, content}. We save it to localStorage so it
-			// persists across navigations AND reloads. Pages without
+			// {filename, content, examples}. We save it to localStorage so
+			// it persists across navigations AND reloads. Pages without
 			// data leave whatever was last loaded in place.
+			//
+			// Two display modes:
+			//   - "source" — raw page markdown
+			//   - "example" — one of the inline-linked /examples/<slug> files
+			// When examples are present, the panel defaults to the first one
+			// and offers a source-toggle to flip back to the page source.
 			const RP_CONTENT_KEY = 'nj:rp:content';
 			const rpFilename = document.getElementById('rp-filename');
 			const rpBody = document.getElementById('rp-body');
+			const rpDownload = document.getElementById('rp-download') as HTMLAnchorElement | null;
+			const rpSourceToggle = document.getElementById('rp-source-toggle') as HTMLButtonElement | null;
 
-			const renderRPContent = (filename: string, content: string) => {
-				if (!rpFilename || !rpBody) return;
-				rpFilename.textContent = filename || 'content.md';
+			interface ExampleRef {
+				slug: string;
+				title: string;
+				filename: string;
+				content: string;
+				href: string;
+			}
+			interface RPPageData {
+				filename: string;
+				content: string;
+				examples: ExampleRef[];
+			}
+
+			let rpCurrent: RPPageData | null = null;
+			let rpMode: 'source' | 'example' = 'source';
+			let rpActiveSlug: string | null = null;
+
+			const renderRPBody = (text: string) => {
+				if (!rpBody) return;
 				const pre = document.createElement('pre');
 				pre.className = 'm-0 p-4 text-[13px] leading-relaxed font-mono text-fg-muted whitespace-pre-wrap break-words';
-				pre.textContent = content;
+				pre.textContent = text;
 				rpBody.innerHTML = '';
 				rpBody.appendChild(pre);
+			};
+
+			const setHeaderControls = (mode: 'source' | 'example', filename: string, downloadHref: string) => {
+				if (rpFilename) {
+					rpFilename.textContent = filename || 'content.md';
+					rpFilename.setAttribute('data-mode', mode);
+				}
+				const showExampleControls = mode === 'example' && !!downloadHref;
+				if (rpDownload) {
+					if (showExampleControls) {
+						rpDownload.href = downloadHref;
+						rpDownload.setAttribute('download', filename);
+						rpDownload.style.display = '';
+					} else {
+						rpDownload.removeAttribute('href');
+						rpDownload.style.display = 'none';
+					}
+				}
+				if (rpSourceToggle) {
+					// Show toggle only when current data has examples (so the
+					// user has a meaningful flip to make).
+					const hasExamples = !!rpCurrent && rpCurrent.examples.length > 0;
+					if (hasExamples) {
+						rpSourceToggle.style.display = '';
+						rpSourceToggle.textContent = mode === 'example' ? 'source' : 'examples';
+						rpSourceToggle.setAttribute(
+							'aria-label',
+							mode === 'example' ? 'View page source' : 'View example file',
+						);
+					} else {
+						rpSourceToggle.style.display = 'none';
+					}
+				}
+			};
+
+			const showExample = (ex: ExampleRef) => {
+				if (!rpCurrent) return;
+				rpMode = 'example';
+				rpActiveSlug = ex.slug;
+				renderRPBody(ex.content);
+				setHeaderControls('example', ex.filename, `/examples/${ex.slug}.md`);
+			};
+
+			const showSource = () => {
+				if (!rpCurrent) return;
+				rpMode = 'source';
+				rpActiveSlug = null;
+				renderRPBody(rpCurrent.content);
+				setHeaderControls('source', rpCurrent.filename || 'content.md', '');
+			};
+
+			const applyRPData = (data: RPPageData) => {
+				rpCurrent = data;
+				if (data.examples && data.examples.length > 0) {
+					showExample(data.examples[0]);
+				} else {
+					showSource();
+				}
 			};
 
 			const pageData = document.getElementById('rp-page-data');
 			if (pageData) {
 				try {
 					const parsed = JSON.parse(pageData.textContent || '{}');
-					if (parsed && typeof parsed.content === 'string' && parsed.content.trim().length > 0) {
-						localStorage.setItem(RP_CONTENT_KEY, JSON.stringify(parsed));
-						renderRPContent(parsed.filename || 'content.md', parsed.content);
+					const normalized: RPPageData = {
+						filename: parsed.filename || 'content.md',
+						content: typeof parsed.content === 'string' ? parsed.content : '',
+						examples: Array.isArray(parsed.examples) ? parsed.examples : [],
+					};
+					if (normalized.content.trim().length > 0 || normalized.examples.length > 0) {
+						localStorage.setItem(RP_CONTENT_KEY, JSON.stringify(normalized));
+						applyRPData(normalized);
 					}
 				} catch {}
 			} else {
@@ -171,11 +267,35 @@ const recentEntries = [...recentPosts, ...recentProjects];
 				const saved = localStorage.getItem(RP_CONTENT_KEY);
 				if (saved) {
 					try {
-						const { filename, content } = JSON.parse(saved);
-						if (content) renderRPContent(filename || 'content.md', content);
+						const parsed = JSON.parse(saved);
+						const normalized: RPPageData = {
+							filename: parsed.filename || 'content.md',
+							content: typeof parsed.content === 'string' ? parsed.content : '',
+							examples: Array.isArray(parsed.examples) ? parsed.examples : [],
+						};
+						applyRPData(normalized);
 					} catch {}
 				}
 			}
+
+			if (rpSourceToggle && !rpSourceToggle.dataset.rpToggleInit) {
+				rpSourceToggle.dataset.rpToggleInit = '1';
+				rpSourceToggle.addEventListener('click', () => {
+					if (!rpCurrent) return;
+					if (rpMode === 'example') {
+						showSource();
+					} else if (rpCurrent.examples.length > 0) {
+						// Flip back to the most-recently-active example, or the first.
+						const target = rpCurrent.examples.find((e) => e.slug === rpActiveSlug)
+							?? rpCurrent.examples[0];
+						showExample(target);
+					}
+				});
+			}
+
+			// Example link interceptor is registered further down, after the
+			// panel state helpers (getRPState/saveRPState/applyRPState) are
+			// defined — those are const arrow functions so they don't hoist.
 
 			// --- Right panel: persisted open/closed + resizable width ---
 			const RP_KEY = 'nj:rp';
@@ -272,6 +392,32 @@ const recentEntries = [...recentPosts, ...recentProjects];
 				(mql as any).__nj_bound = true;
 				mql.addEventListener('change', () => applyRPState(false));
 			}
+
+			// Intercept inline links to /examples/<slug>/ in the article body —
+			// swap drawer content instead of navigating. Middle-click and
+			// open-in-new-tab still work since we only handle plain left-click.
+			document.querySelectorAll<HTMLAnchorElement>('.prose a[href^="/examples/"]').forEach((a) => {
+				if (a.dataset.rpExampleInit) return;
+				a.dataset.rpExampleInit = '1';
+				a.addEventListener('click', (e) => {
+					if (e.defaultPrevented) return;
+					if (e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
+					if (!rpCurrent || rpCurrent.examples.length === 0) return;
+					const href = a.getAttribute('href') || '';
+					const m = href.match(/^\/examples\/([a-z0-9-]+)\/?$/i);
+					if (!m) return;
+					const slug = m[1];
+					const ex = rpCurrent.examples.find((e2) => e2.slug === slug);
+					if (!ex) return;
+					e.preventDefault();
+					const s = getRPState();
+					if (!s.open) {
+						saveRPState({ ...s, open: true });
+						applyRPState(true);
+					}
+					showExample(ex);
+				});
+			});
 
 			// Resize handle
 			const rpResize = document.getElementById('rightpanel-resize');

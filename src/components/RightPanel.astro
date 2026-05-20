@@ -1,26 +1,43 @@
 ---
-// Right panel: always rendered. State (open/closed + width) lives in
-// localStorage so it survives navigations and reloads. Drag the left
-// edge to resize between 240px and 600px.
+// Right panel. Two display modes:
+//   1. "source" mode — shows the current page's raw markdown source.
+//   2. "example" mode — shows one of the inline-linked /examples/<slug> files
+//      from the page body. Clicking an example link in the article swaps the
+//      panel to that file (no nav). Source toggle flips back to mode 1.
 //
-// Content (filename + markdown body) is injected at runtime by Layout
-// from a per-page <script id="rp-page-data" type="application/json">.
-// Pages WITH markdown update the panel; pages WITHOUT markdown leave
-// whatever was last loaded in place.
+// State (open + width) lives in localStorage and survives navigations/reloads.
+// Page-level content (raw source + array of resolved examples) is injected at
+// runtime via a hidden <script id="rp-page-data" type="application/json"> the
+// Layout JS reads.
+interface ExampleRef {
+	slug: string;
+	title: string;
+	filename: string;
+	content: string;
+	href: string;
+}
 interface Props {
 	rawMarkdown?: string;
 	filename?: string;
+	examples?: ExampleRef[];
 }
-const { rawMarkdown = '', filename = '' } = Astro.props;
-const hasContent = rawMarkdown.trim().length > 0;
+const { rawMarkdown = '', filename = '', examples = [] } = Astro.props;
+const hasContent = rawMarkdown.trim().length > 0 || examples.length > 0;
+const initialIsExample = examples.length > 0;
+const initialFilename = initialIsExample ? examples[0].filename : (filename || 'no-source.md');
+const initialContent = initialIsExample ? examples[0].content : rawMarkdown;
+const initialDownload = initialIsExample ? `/examples/${examples[0].slug}.md` : '';
 ---
 
-{/* Per-page data — read by Layout JS to update the panel on navigation */}
 {hasContent && (
 	<script
 		type="application/json"
 		id="rp-page-data"
-		set:html={JSON.stringify({ filename: filename || 'content.md', content: rawMarkdown })}
+		set:html={JSON.stringify({
+			filename: filename || 'content.md',
+			content: rawMarkdown,
+			examples,
+		})}
 	/>
 )}
 
@@ -74,30 +91,55 @@ const hasContent = rawMarkdown.trim().length > 0;
 	</div>
 
 	<div class="shrink-0 flex flex-col h-full max-lg:!w-[min(90vw,380px)]" id="rightpanel-content" style="width: 320px">
-		<div class="flex items-center justify-between px-4 h-12 border-b border-border-soft shrink-0">
+		<div class="flex items-center justify-between gap-2 px-3 h-12 border-b border-border-soft shrink-0">
 			<div class="flex items-center gap-2 text-sm min-w-0">
 				<svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="text-fg-muted shrink-0" aria-hidden="true">
 					<path d="M3 2h6l3 3v7a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V3a1 1 0 0 1 1-1ZM9 2v3h3" />
 				</svg>
-				<span id="rp-filename" class="font-mono text-[13px] text-fg-muted truncate">
-					{filename || 'no-source.md'}
+				<span id="rp-filename" class="font-mono text-[13px] text-fg-muted truncate" data-mode={initialIsExample ? 'example' : 'source'}>
+					{initialFilename}
 				</span>
 			</div>
-			<button
-				type="button"
-				id="rightpanel-close"
-				class="p-1 rounded text-fg-muted hover:bg-surface hover:text-fg border-0 bg-transparent cursor-pointer"
-				aria-label="Close markdown source panel"
-			>
-				<svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-					<path d="M3 3l8 8M11 3l-8 8" />
-				</svg>
-			</button>
+			<div class="flex items-center gap-1 shrink-0">
+				<a
+					id="rp-download"
+					href={initialDownload}
+					download={initialIsExample ? examples[0].filename : ''}
+					class="p-1 rounded text-fg-muted hover:bg-surface hover:text-fg no-underline transition-colors"
+					style={initialIsExample ? '' : 'display: none'}
+					aria-label="Download file"
+					title="Download .md"
+				>
+					<svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+						<path d="M7 1v9M3 7l4 4 4-4M2 13h10" />
+					</svg>
+				</a>
+				<button
+					type="button"
+					id="rp-source-toggle"
+					class="px-2 py-0.5 rounded text-[11px] uppercase tracking-wider text-fg-muted hover:bg-surface hover:text-fg border-0 bg-transparent cursor-pointer transition-colors"
+					style={initialIsExample ? '' : 'display: none'}
+					aria-label="View page source"
+					title="View page source"
+				>
+					source
+				</button>
+				<button
+					type="button"
+					id="rightpanel-close"
+					class="p-1 rounded text-fg-muted hover:bg-surface hover:text-fg border-0 bg-transparent cursor-pointer"
+					aria-label="Close markdown source panel"
+				>
+					<svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+						<path d="M3 3l8 8M11 3l-8 8" />
+					</svg>
+				</button>
+			</div>
 		</div>
 
 		<div id="rp-body" class="flex-1 overflow-auto bg-bg-elevated">
 			{hasContent ? (
-				<pre class="m-0 p-4 text-[13px] leading-relaxed font-mono text-fg-muted whitespace-pre-wrap break-words">{rawMarkdown}</pre>
+				<pre class="m-0 p-4 text-[13px] leading-relaxed font-mono text-fg-muted whitespace-pre-wrap break-words">{initialContent}</pre>
 			) : (
 				<div class="h-full flex flex-col items-center justify-center px-6 text-center text-fg-dim text-[13px] gap-2">
 					<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="opacity-60" aria-hidden="true">
