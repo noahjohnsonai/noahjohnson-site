@@ -36,7 +36,12 @@ The roguelite shape forces every system to be playable in isolation, which makes
 
 ## Stack at a glance
 
-Godot · GDScript · GUT for tests · Lefthook running gdformat, gdlint, parse-check, and GUT as pre-commit gates · paid low-poly character and environment kits · CC0 audio.
+- **[Godot 4](https://godotengine.org)** — engine and editor
+- **[GDScript](https://docs.godotengine.org/en/stable/tutorials/scripting/gdscript/)** — language
+- **[GUT](https://github.com/bitwes/Gut)** — unit and scene test framework
+- **[Lefthook](https://github.com/evilmartians/lefthook)** — pre-commit gates running gdformat, gdlint, parse-check, and GUT
+- **Paid low-poly character and environment kits** — visual asset library
+- **CC0 audio** — royalty-free SFX and music
 
 ## How it's built
 

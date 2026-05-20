@@ -48,7 +48,14 @@ Pre-engagement intake is the single most expensive thing a service business does
 
 ## Stack at a glance
 
-Next.js (App Router) · TypeScript · Tailwind · shadcn/ui · Supabase (Postgres, Auth, Storage) · Anthropic Claude via the Zero Data Retention endpoint · Resend · Upstash Ratelimit · Vercel · Vitest · Playwright · Lefthook · Biome.
+- **[Next.js](https://nextjs.org) 15** (App Router) with **[TypeScript](https://www.typescriptlang.org)**
+- **[Tailwind v4](https://tailwindcss.com) + [shadcn/ui](https://ui.shadcn.com)** — UI primitives
+- **[Supabase](https://supabase.com)** — Postgres + Auth + Storage with RLS
+- **[Anthropic Claude](https://www.anthropic.com/claude) via the [Zero Data Retention endpoint](https://docs.anthropic.com/en/docs/about-claude/data-usage-and-privacy)** — agent reasoning under a "never used for training" contract
+- **[Resend](https://resend.com) + [Upstash Ratelimit](https://upstash.com)** — server-side brief delivery and per-IP/per-session abuse caps
+- **[Vitest](https://vitest.dev) + [Playwright](https://playwright.dev)** — unit and end-to-end coverage
+- **[Lefthook](https://github.com/evilmartians/lefthook) + [Biome](https://biomejs.dev)** — pre-commit gates and formatter
+- **Hosted on [Vercel](https://vercel.com)**
 
 ## How it's built
 

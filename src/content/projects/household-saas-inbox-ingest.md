@@ -50,7 +50,14 @@ Personal-CRM and household-org tools share one cold-start problem: nobody fills 
 
 ## Stack at a glance
 
-Next.js · React · TypeScript · Tailwind · shadcn/ui · Supabase (Postgres, Auth, Storage) · Drizzle · Inngest · Anthropic Claude via the Vercel AI SDK · Resend · Sentry · Vitest with pglite · Playwright.
+- **[Next.js](https://nextjs.org) 15** with **[React 19](https://react.dev)** — App Router, Server Actions
+- **[Tailwind v4](https://tailwindcss.com) + [shadcn/ui](https://ui.shadcn.com)** — design tokens via `@theme`
+- **[Supabase](https://supabase.com) + [Drizzle](https://orm.drizzle.team)** — Postgres + Auth + Storage with RLS, typed schema and migrations
+- **[Inngest](https://www.inngest.com)** — durable functions for the inbox-ingest pipeline
+- **[Anthropic Claude](https://www.anthropic.com/claude) via the [Vercel AI SDK](https://sdk.vercel.ai)** — extractors at the trust boundary
+- **[Resend](https://resend.com) + [Sentry](https://sentry.io)** — transactional mail and observability
+- **[Vitest](https://vitest.dev) with pglite + [Playwright](https://playwright.dev)** — RLS-aware unit specs and end-to-end smoke
+- **Hosted on [Vercel](https://vercel.com)**, local-first dev through the MVP, cloud cutover at beta
 
 ## How it's built
 

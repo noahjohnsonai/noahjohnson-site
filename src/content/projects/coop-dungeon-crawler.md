@@ -48,7 +48,13 @@ Most co-op games either demand reflexes that don't translate to a browser or com
 
 ## Stack at a glance
 
-TypeScript monorepo · Bun WebSocket world server · Vite + Three.js game client · Supabase Postgres with RLS · Vitest + Playwright · Biome · pnpm · Lefthook · Docker for local infra.
+- **[TypeScript](https://www.typescriptlang.org)** monorepo via **[pnpm](https://pnpm.io)** workspaces
+- **[Bun](https://bun.sh)** — WebSocket world server, tick scheduler
+- **[Vite](https://vitejs.dev) + [Three.js](https://threejs.org)** — game client and 3D scene
+- **[Supabase](https://supabase.com)** — Postgres with RLS for persistence
+- **[Vitest](https://vitest.dev) + [Playwright](https://playwright.dev)** — unit and end-to-end coverage
+- **[Biome](https://biomejs.dev) + [Lefthook](https://github.com/evilmartians/lefthook)** — formatter and pre-commit gates
+- **[Docker](https://www.docker.com)** — local infra stack
 
 ## How it's built
 

@@ -44,7 +44,12 @@ Most ops teams run resource planning in a spreadsheet and pipeline in a CRM, and
 
 ## Stack at a glance
 
-Vite · React · TypeScript · Tailwind v4 · shadcn/ui (Radix primitives) · react-dnd · lucide-react · Supabase (Postgres + RLS) · Figma for design and handoff. Two environments — production and staging — with separate Supabase projects so live planning data isn't touched during iteration.
+- **[Vite](https://vitejs.dev) + [React](https://react.dev) + [TypeScript](https://www.typescriptlang.org)** — single-page client
+- **[Tailwind v4](https://tailwindcss.com) + [shadcn/ui](https://ui.shadcn.com)** — built on **[Radix UI](https://www.radix-ui.com)** primitives
+- **[react-dnd](https://react-dnd.github.io/react-dnd/)** — drag-and-drop slotting for the board
+- **[lucide-react](https://lucide.dev)** — icon set
+- **[Supabase](https://supabase.com)** — Postgres with RLS; separate projects for staging and production so live planning data isn't touched during iteration
+- **[Figma](https://www.figma.com)** — design source, exported as a structured HTML + React handoff folder
 
 ## How it's built
 
