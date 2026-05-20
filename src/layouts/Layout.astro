@@ -507,13 +507,17 @@ const recentEntries = [...recentPosts, ...recentProjects];
 			const KEY = 'nj:visited';
 			const visited: Record<string, true> = JSON.parse(localStorage.getItem(KEY) ?? '{}');
 
-			// Reveal orange dot for posts NOT in visited
-			document.querySelectorAll('[data-unvisited-dot]').forEach((el) => {
-				const slug = el.getAttribute('data-unvisited-dot');
-				if (slug && !visited[slug]) {
-					(el as HTMLElement).style.opacity = '1';
-				}
-			});
+			// Sync every dot in BOTH directions — show for unvisited, hide for visited.
+			// Without the else branch, dots stayed lit on previously-unvisited slugs
+			// even after the user navigated to them, until a full refresh.
+			const syncDots = () => {
+				const v: Record<string, true> = JSON.parse(localStorage.getItem(KEY) ?? '{}');
+				document.querySelectorAll('[data-unvisited-dot]').forEach((el) => {
+					const slug = el.getAttribute('data-unvisited-dot');
+					(el as HTMLElement).style.opacity = slug && !v[slug] ? '1' : '0';
+				});
+			};
+			syncDots();
 
 			// Mark current slug as visited if we're on a post/project/about page
 			const path = location.pathname.replace(/\/$/, '').replace(/^\//, '');
@@ -521,6 +525,24 @@ const recentEntries = [...recentPosts, ...recentProjects];
 				visited[path] = true;
 				localStorage.setItem(KEY, JSON.stringify(visited));
 			}
+
+			// Real-time: when the user clicks a sidebar link to a post/project/about,
+			// mark it visited and hide its dot immediately — don't wait for the
+			// destination page's init() to fire after the view transition.
+			document.querySelectorAll('aside#sidebar a[data-slug]').forEach((el) => {
+				const a = el as HTMLAnchorElement;
+				if (a.dataset.dotInit) return;
+				a.dataset.dotInit = '1';
+				a.addEventListener('click', () => {
+					const slug = a.getAttribute('data-slug');
+					if (!slug) return;
+					const v: Record<string, true> = JSON.parse(localStorage.getItem(KEY) ?? '{}');
+					v[slug] = true;
+					localStorage.setItem(KEY, JSON.stringify(v));
+					const dot = a.querySelector('[data-unvisited-dot]') as HTMLElement | null;
+					if (dot) dot.style.opacity = '0';
+				});
+			});
 		}
 
 		init();
