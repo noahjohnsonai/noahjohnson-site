@@ -54,7 +54,7 @@ const recentEntries = [...recentPosts, ...recentProjects];
 			</main>
 			<Mascot
 				size={88}
-				class="mascot absolute right-4 sm:right-6 opacity-90 pointer-events-none select-none z-10"
+				class="mascot hidden sm:block absolute right-4 sm:right-6 opacity-90 pointer-events-none select-none z-10"
 				style="bottom: 6.25rem"
 			/>
 			<SearchBar />
@@ -170,22 +170,47 @@ const recentEntries = [...recentPosts, ...recentProjects];
 			const saveRPState = (s: { open: boolean; width: number }) => {
 				localStorage.setItem(RP_KEY, JSON.stringify(s));
 			};
+			const isDesktop = () => window.matchMedia('(min-width: 1024px)').matches;
+
 			const applyRPState = (animate = true) => {
 				if (!rp) return;
 				const { open, width } = getRPState();
 				rp.dataset.open = open ? '1' : '0';
 				const rpEl = rp as HTMLElement;
 				const inner = document.getElementById('rightpanel-content') as HTMLElement | null;
-				if (!animate) rpEl.style.transition = 'none';
-				rpEl.style.width = open ? `${width}px` : '0px';
-				rpEl.style.borderLeftWidth = open ? '1px' : '0';
-				if (inner) inner.style.width = `${width}px`;
-				if (!animate) {
-					// Force reflow then re-enable transitions on next frame
-					void rpEl.offsetWidth;
-					requestAnimationFrame(() => {
-						rpEl.style.transition = '';
-					});
+				const backdrop = document.getElementById('rightpanel-backdrop');
+
+				if (isDesktop()) {
+					if (!animate) rpEl.style.transition = 'none';
+					rpEl.style.width = open ? `${width}px` : '0px';
+					rpEl.style.borderLeftWidth = open ? '1px' : '0';
+					if (inner) inner.style.width = `${width}px`;
+					if (!animate) {
+						void rpEl.offsetWidth;
+						requestAnimationFrame(() => {
+							rpEl.style.transition = '';
+						});
+					}
+					// Hide mobile backdrop on desktop
+					if (backdrop) {
+						backdrop.classList.add('opacity-0', 'pointer-events-none');
+						backdrop.classList.remove('opacity-100');
+					}
+				} else {
+					// Mobile: CSS handles transform via [data-open="1"].
+					// Clear any inline width that desktop set so CSS rules win.
+					rpEl.style.width = '';
+					rpEl.style.borderLeftWidth = '';
+					if (inner) inner.style.width = '';
+					if (backdrop) {
+						if (open) {
+							backdrop.classList.remove('opacity-0', 'pointer-events-none');
+							backdrop.classList.add('opacity-100');
+						} else {
+							backdrop.classList.add('opacity-0', 'pointer-events-none');
+							backdrop.classList.remove('opacity-100');
+						}
+					}
 				}
 			};
 
@@ -204,6 +229,16 @@ const recentEntries = [...recentPosts, ...recentProjects];
 			};
 			if (rpToggle) (rpToggle as HTMLElement).onclick = toggleRP;
 			if (rpClose) (rpClose as HTMLElement).onclick = toggleRP;
+			// Click backdrop to close on mobile
+			const rpBackdrop = document.getElementById('rightpanel-backdrop');
+			if (rpBackdrop) (rpBackdrop as HTMLElement).onclick = toggleRP;
+
+			// Re-apply state when viewport crosses lg breakpoint
+			const mql = window.matchMedia('(min-width: 1024px)');
+			if (!(mql as any).__nj_bound) {
+				(mql as any).__nj_bound = true;
+				mql.addEventListener('change', () => applyRPState(false));
+			}
 
 			// Resize handle
 			const rpResize = document.getElementById('rightpanel-resize');
