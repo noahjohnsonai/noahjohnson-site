@@ -2,7 +2,7 @@
 title: How I built a writing harness on Claude Code
 description: A grilling-instead-of-drafting workflow for AI-assisted writing, and what it cost to choose the slow path.
 pubDate: 2026-05-20
-draft: true
+draft: false
 project: noahjohnson-ai
 tags:
   - claude-code
