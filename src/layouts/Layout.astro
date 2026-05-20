@@ -147,22 +147,21 @@ const recentEntries = [...recentPosts, ...recentProjects];
 			const rpClose = document.getElementById('rightpanel-close');
 
 			// --- Right panel content tracking ---
-			// Each page that has markdown content includes a hidden
-			// <script id="rp-page-data" type="application/json"> with
-			// {filename, content, examples}. We save it to localStorage so
-			// it persists across navigations AND reloads. Pages without
-			// data leave whatever was last loaded in place.
+			// The drawer is reserved for take-home example files referenced
+			// inline in the article body. Pages with examples render the first
+			// one by default; pages without examples render the empty state.
+			// The page's own markdown source is NOT shown in the drawer.
 			//
-			// Two display modes:
-			//   - "source" — raw page markdown
-			//   - "example" — one of the inline-linked /examples/<slug> files
-			// When examples are present, the panel defaults to the first one
-			// and offers a source-toggle to flip back to the page source.
+			// Each page that has linked examples includes a hidden
+			// <script id="rp-page-data" type="application/json"> with
+			// { examples }. We save it to localStorage so it persists across
+			// navigations and reloads. When navigating to a page without
+			// examples, the last cached examples remain visible (so the user
+			// can keep an example open while browsing).
 			const RP_CONTENT_KEY = 'nj:rp:content';
 			const rpFilename = document.getElementById('rp-filename');
 			const rpBody = document.getElementById('rp-body');
 			const rpDownload = document.getElementById('rp-download') as HTMLAnchorElement | null;
-			const rpSourceToggle = document.getElementById('rp-source-toggle') as HTMLButtonElement | null;
 
 			interface ExampleRef {
 				slug: string;
@@ -171,15 +170,25 @@ const recentEntries = [...recentPosts, ...recentProjects];
 				content: string;
 				href: string;
 			}
-			interface RPPageData {
-				filename: string;
-				content: string;
-				examples: ExampleRef[];
-			}
 
-			let rpCurrent: RPPageData | null = null;
-			let rpMode: 'source' | 'example' = 'source';
-			let rpActiveSlug: string | null = null;
+			let rpExamples: ExampleRef[] = [];
+
+			const renderEmpty = () => {
+				if (!rpBody) return;
+				rpBody.innerHTML = `
+					<div class="h-full flex flex-col items-center justify-center px-6 text-center text-fg-dim text-[13px] gap-2">
+						<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="opacity-60" aria-hidden="true">
+							<path d="M4 6h16M4 10h16M4 14h10M4 18h10" />
+						</svg>
+						<p class="m-0 leading-relaxed">Nothing to show here.<br/>Articles with take-home files surface them in this drawer.</p>
+					</div>
+				`;
+				if (rpFilename) rpFilename.textContent = '';
+				if (rpDownload) {
+					rpDownload.removeAttribute('href');
+					rpDownload.style.display = 'none';
+				}
+			};
 
 			const renderRPBody = (text: string) => {
 				if (!rpBody) return;
@@ -190,61 +199,22 @@ const recentEntries = [...recentPosts, ...recentProjects];
 				rpBody.appendChild(pre);
 			};
 
-			const setHeaderControls = (mode: 'source' | 'example', filename: string, downloadHref: string) => {
-				if (rpFilename) {
-					rpFilename.textContent = filename || 'content.md';
-					rpFilename.setAttribute('data-mode', mode);
-				}
-				const showExampleControls = mode === 'example' && !!downloadHref;
-				if (rpDownload) {
-					if (showExampleControls) {
-						rpDownload.href = downloadHref;
-						rpDownload.setAttribute('download', filename);
-						rpDownload.style.display = '';
-					} else {
-						rpDownload.removeAttribute('href');
-						rpDownload.style.display = 'none';
-					}
-				}
-				if (rpSourceToggle) {
-					// Show toggle only when current data has examples (so the
-					// user has a meaningful flip to make).
-					const hasExamples = !!rpCurrent && rpCurrent.examples.length > 0;
-					if (hasExamples) {
-						rpSourceToggle.style.display = '';
-						rpSourceToggle.textContent = mode === 'example' ? 'source' : 'examples';
-						rpSourceToggle.setAttribute(
-							'aria-label',
-							mode === 'example' ? 'View page source' : 'View example file',
-						);
-					} else {
-						rpSourceToggle.style.display = 'none';
-					}
-				}
-			};
-
 			const showExample = (ex: ExampleRef) => {
-				if (!rpCurrent) return;
-				rpMode = 'example';
-				rpActiveSlug = ex.slug;
 				renderRPBody(ex.content);
-				setHeaderControls('example', ex.filename, `/examples/${ex.slug}.md`);
+				if (rpFilename) rpFilename.textContent = ex.filename;
+				if (rpDownload) {
+					rpDownload.href = `/examples/${ex.slug}.md`;
+					rpDownload.setAttribute('download', ex.filename);
+					rpDownload.style.display = '';
+				}
 			};
 
-			const showSource = () => {
-				if (!rpCurrent) return;
-				rpMode = 'source';
-				rpActiveSlug = null;
-				renderRPBody(rpCurrent.content);
-				setHeaderControls('source', rpCurrent.filename || 'content.md', '');
-			};
-
-			const applyRPData = (data: RPPageData) => {
-				rpCurrent = data;
-				if (data.examples && data.examples.length > 0) {
-					showExample(data.examples[0]);
+			const applyExamples = (examples: ExampleRef[]) => {
+				rpExamples = examples;
+				if (examples.length > 0) {
+					showExample(examples[0]);
 				} else {
-					showSource();
+					renderEmpty();
 				}
 			};
 
@@ -252,45 +222,22 @@ const recentEntries = [...recentPosts, ...recentProjects];
 			if (pageData) {
 				try {
 					const parsed = JSON.parse(pageData.textContent || '{}');
-					const normalized: RPPageData = {
-						filename: parsed.filename || 'content.md',
-						content: typeof parsed.content === 'string' ? parsed.content : '',
-						examples: Array.isArray(parsed.examples) ? parsed.examples : [],
-					};
-					if (normalized.content.trim().length > 0 || normalized.examples.length > 0) {
-						localStorage.setItem(RP_CONTENT_KEY, JSON.stringify(normalized));
-						applyRPData(normalized);
+					const examples: ExampleRef[] = Array.isArray(parsed.examples) ? parsed.examples : [];
+					if (examples.length > 0) {
+						localStorage.setItem(RP_CONTENT_KEY, JSON.stringify({ examples }));
+						applyExamples(examples);
 					}
 				} catch {}
 			} else {
-				// No page data on this route — fall back to last loaded.
+				// No page data on this route — fall back to last cached examples.
 				const saved = localStorage.getItem(RP_CONTENT_KEY);
 				if (saved) {
 					try {
 						const parsed = JSON.parse(saved);
-						const normalized: RPPageData = {
-							filename: parsed.filename || 'content.md',
-							content: typeof parsed.content === 'string' ? parsed.content : '',
-							examples: Array.isArray(parsed.examples) ? parsed.examples : [],
-						};
-						applyRPData(normalized);
+						const examples: ExampleRef[] = Array.isArray(parsed.examples) ? parsed.examples : [];
+						applyExamples(examples);
 					} catch {}
 				}
-			}
-
-			if (rpSourceToggle && !rpSourceToggle.dataset.rpToggleInit) {
-				rpSourceToggle.dataset.rpToggleInit = '1';
-				rpSourceToggle.addEventListener('click', () => {
-					if (!rpCurrent) return;
-					if (rpMode === 'example') {
-						showSource();
-					} else if (rpCurrent.examples.length > 0) {
-						// Flip back to the most-recently-active example, or the first.
-						const target = rpCurrent.examples.find((e) => e.slug === rpActiveSlug)
-							?? rpCurrent.examples[0];
-						showExample(target);
-					}
-				});
 			}
 
 			// Example link interceptor is registered further down, after the

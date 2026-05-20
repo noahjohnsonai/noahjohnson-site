@@ -22,22 +22,21 @@ interface Props {
 	examples?: ExampleRef[];
 }
 const { rawMarkdown = '', filename = '', examples = [] } = Astro.props;
-const hasContent = rawMarkdown.trim().length > 0 || examples.length > 0;
-const initialIsExample = examples.length > 0;
-const initialFilename = initialIsExample ? examples[0].filename : (filename || 'no-source.md');
-const initialContent = initialIsExample ? examples[0].content : rawMarkdown;
-const initialDownload = initialIsExample ? `/examples/${examples[0].slug}.md` : '';
+// rawMarkdown / filename are still accepted (passed by PostLayout) but the
+// drawer no longer renders the page's own source. The drawer is reserved
+// for take-home example files referenced inline in the article body. Pages
+// without examples render the empty state.
+const hasExamples = examples.length > 0;
+const initialFilename = hasExamples ? examples[0].filename : '';
+const initialContent = hasExamples ? examples[0].content : '';
+const initialDownload = hasExamples ? `/examples/${examples[0].slug}.md` : '';
 ---
 
-{hasContent && (
+{hasExamples && (
 	<script
 		type="application/json"
 		id="rp-page-data"
-		set:html={JSON.stringify({
-			filename: filename || 'content.md',
-			content: rawMarkdown,
-			examples,
-		})}
+		set:html={JSON.stringify({ examples })}
 	/>
 )}
 
@@ -96,7 +95,7 @@ const initialDownload = initialIsExample ? `/examples/${examples[0].slug}.md` : 
 				<svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="text-fg-muted shrink-0" aria-hidden="true">
 					<path d="M3 2h6l3 3v7a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V3a1 1 0 0 1 1-1ZM9 2v3h3" />
 				</svg>
-				<span id="rp-filename" class="font-mono text-[13px] text-fg-muted truncate" data-mode={initialIsExample ? 'example' : 'source'}>
+				<span id="rp-filename" class="font-mono text-[13px] text-fg-muted truncate">
 					{initialFilename}
 				</span>
 			</div>
@@ -104,9 +103,9 @@ const initialDownload = initialIsExample ? `/examples/${examples[0].slug}.md` : 
 				<a
 					id="rp-download"
 					href={initialDownload}
-					download={initialIsExample ? examples[0].filename : ''}
+					download={hasExamples ? examples[0].filename : ''}
 					class="p-1 rounded text-fg-muted hover:bg-surface hover:text-fg no-underline transition-colors"
-					style={initialIsExample ? '' : 'display: none'}
+					style={hasExamples ? '' : 'display: none'}
 					aria-label="Download file"
 					title="Download .md"
 				>
@@ -114,16 +113,6 @@ const initialDownload = initialIsExample ? `/examples/${examples[0].slug}.md` : 
 						<path d="M7 1v9M3 7l4 4 4-4M2 13h10" />
 					</svg>
 				</a>
-				<button
-					type="button"
-					id="rp-source-toggle"
-					class="px-2 py-0.5 rounded text-[11px] uppercase tracking-wider text-fg-muted hover:bg-surface hover:text-fg border-0 bg-transparent cursor-pointer transition-colors"
-					style={initialIsExample ? '' : 'display: none'}
-					aria-label="View page source"
-					title="View page source"
-				>
-					source
-				</button>
 				<button
 					type="button"
 					id="rightpanel-close"
@@ -138,14 +127,14 @@ const initialDownload = initialIsExample ? `/examples/${examples[0].slug}.md` : 
 		</div>
 
 		<div id="rp-body" class="flex-1 overflow-auto bg-bg-elevated">
-			{hasContent ? (
+			{hasExamples ? (
 				<pre class="m-0 p-4 text-[13px] leading-relaxed font-mono text-fg-muted whitespace-pre-wrap break-words">{initialContent}</pre>
 			) : (
 				<div class="h-full flex flex-col items-center justify-center px-6 text-center text-fg-dim text-[13px] gap-2">
 					<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="opacity-60" aria-hidden="true">
 						<path d="M4 6h16M4 10h16M4 14h10M4 18h10" />
 					</svg>
-					<p class="m-0 leading-relaxed">No source for this page.<br/>Open a post or project to see its markdown.</p>
+					<p class="m-0 leading-relaxed">Nothing to show here.<br/>Articles with take-home files surface them in this drawer.</p>
 				</div>
 			)}
 		</div>
