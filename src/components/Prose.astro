@@ -186,21 +186,8 @@
 		margin-bottom: 2em;
 	}
 
-	/* Project-page thumbnail size override.
-	   Higher specificity than `.prose img` above so it wins inside the
-	   project content wrapper. */
-	.prose .project-content.project-content img {
-		max-width: 240px;
-		width: auto;
-		height: auto;
-		display: block;
-		margin: 1.25em 0;
-		box-shadow: 0 4px 16px -8px rgba(0, 0, 0, 0.5);
-		transition: border-color 150ms ease, transform 150ms ease;
-		cursor: pointer;
-	}
-	.prose .project-content.project-content img:hover {
-		border-color: var(--color-border);
-		transform: translateY(-1px);
-	}
+	/* Project body images: use the default .prose img full-width treatment
+	   (previous override capped them at 240px thumbnails — removed so any
+	   inline screenshot in a project body renders at the same scale as
+	   the hero cover, matching the case-study reading experience). */
 </style>

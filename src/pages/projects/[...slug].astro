@@ -27,6 +27,8 @@ const caseStudies = await getCaseStudiesForProject(entry.id);
 	rawMarkdown={entry.body ?? ''}
 	rawFilename={`${entry.id}.md`}
 	showProgress={false}
+	cover={entry.data.cover}
+	coverAlt={entry.data.coverAlt}
 >
 	{skills.length > 0 && (
 		<section slot="belowHeader" class="mb-6" aria-labelledby="project-skills-heading">
