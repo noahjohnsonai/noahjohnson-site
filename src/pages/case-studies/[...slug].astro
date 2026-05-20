@@ -15,6 +15,10 @@ export async function getStaticPaths() {
 const { entry } = Astro.props;
 const { Content } = await render(entry);
 const examples = await getReferencedExamples(entry.body ?? '');
+// Fetch the paired project so the chip can show its title (not just slug).
+// assertCaseStudyInvariants above guarantees this lookup succeeds.
+const allProjects = await getCollection('projects');
+const pairedProject = allProjects.find((p) => p.id === entry.data.project);
 ---
 
 <PostLayout
@@ -31,17 +35,20 @@ const examples = await getReferencedExamples(entry.body ?? '');
 	cover={entry.data.cover}
 	coverAlt={entry.data.coverAlt}
 >
+	{pairedProject && (
+		<aside slot="belowHeader" class="mb-6">
+			<a
+				href={`/projects/${pairedProject.id}/`}
+				class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-accent/40 bg-accent/5 text-accent text-[13px] font-medium no-underline hover:bg-accent/10 hover:border-accent/60 transition-colors"
+			>
+				<svg width="13" height="13" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+					<path d="M2 4a1 1 0 0 1 1-1h3l2 2h3a1 1 0 0 1 1 1v5a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V4Z" />
+				</svg>
+				<span>Paired with project: {pairedProject.data.title}</span>
+			</a>
+		</aside>
+	)}
 	<div class="project-content">
 		<Content />
 	</div>
-	<aside slot="after" class="mt-10 pt-6 border-t border-border-soft text-sm text-fg-muted">
-		Paired with project:
-		{' '}
-		<a
-			href={`/projects/${entry.data.project}/`}
-			class="text-accent hover:underline"
-		>
-			{entry.data.project}
-		</a>
-	</aside>
 </PostLayout>
