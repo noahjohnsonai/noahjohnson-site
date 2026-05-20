@@ -2,7 +2,7 @@
 import { getCollection, render } from 'astro:content';
 import PostLayout from '../../layouts/PostLayout.astro';
 import SkillsShowcase from '../../components/SkillsShowcase.astro';
-import { getCaseStudyForProject } from '../../lib/data.ts';
+import { getCaseStudiesForProject } from '../../lib/data.ts';
 
 export async function getStaticPaths() {
 	const projects = await getCollection('projects', ({ data }) => !data.draft);
@@ -15,7 +15,7 @@ export async function getStaticPaths() {
 const { entry } = Astro.props;
 const { Content } = await render(entry);
 const skills = entry.data.skills ?? [];
-const caseStudy = await getCaseStudyForProject(entry.id);
+const caseStudies = await getCaseStudiesForProject(entry.id);
 ---
 
 <PostLayout
@@ -33,17 +33,19 @@ const caseStudy = await getCaseStudyForProject(entry.id);
 			<SkillsShowcase rows={[{ direction: 'left', skills }]} duration={25} />
 		</section>
 	)}
-	{caseStudy && (
-		<aside slot="belowHeader" class="mb-6">
-			<a
-				href={`/case-studies/${caseStudy.id}/`}
-				class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-accent/40 bg-accent/5 text-accent text-[13px] font-medium no-underline hover:bg-accent/10 hover:border-accent/60 transition-colors"
-			>
-				<svg width="13" height="13" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-					<path d="M3 2h6l3 3v7a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V3a1 1 0 0 1 1-1ZM9 2v3h3M5 8h4M5 10h3" />
-				</svg>
-				<span>Read the case study: {caseStudy.data.title}</span>
-			</a>
+	{caseStudies.length > 0 && (
+		<aside slot="belowHeader" class="mb-6 flex flex-wrap gap-2">
+			{caseStudies.map((cs) => (
+				<a
+					href={`/case-studies/${cs.id}/`}
+					class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-accent/40 bg-accent/5 text-accent text-[13px] font-medium no-underline hover:bg-accent/10 hover:border-accent/60 transition-colors"
+				>
+					<svg width="13" height="13" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+						<path d="M3 2h6l3 3v7a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V3a1 1 0 0 1 1-1ZM9 2v3h3M5 8h4M5 10h3" />
+					</svg>
+					<span>Read the case study: {cs.data.title}</span>
+				</a>
+			))}
 		</aside>
 	)}
 	<div class="project-content">

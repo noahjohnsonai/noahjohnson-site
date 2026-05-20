@@ -32,7 +32,6 @@ export async function assertCaseStudyInvariants(): Promise<void> {
 		getCollection('projects'),
 	]);
 	const projectIds = new Set(projects.map((p) => p.id));
-	const seen = new Map<string, string>(); // project slug -> case-study id
 	for (const cs of caseStudies) {
 		const proj = cs.data.project;
 		if (!projectIds.has(proj)) {
@@ -41,24 +40,18 @@ export async function assertCaseStudyInvariants(): Promise<void> {
 				`Either create the project or fix the case study's frontmatter.`,
 			);
 		}
-		const prev = seen.get(proj);
-		if (prev) {
-			throw new Error(
-				`Two case studies reference the same project "${proj}": "${prev}" and "${cs.id}". ` +
-				`Case studies must be 1:1 with projects — merge or remove one.`,
-			);
-		}
-		seen.set(proj, cs.id);
 	}
 }
 
-// Get the case study for a project slug, or null if none exists. Used by
-// the project page to render the cross-link chip.
-export async function getCaseStudyForProject(
+// Get all case studies that reference a project slug, newest first. Multiple
+// case studies per project are allowed.
+export async function getCaseStudiesForProject(
 	projectSlug: string,
-): Promise<CollectionEntry<'caseStudies'> | null> {
+): Promise<CollectionEntry<'caseStudies'>[]> {
 	const all = await getCollection('caseStudies', ({ data }) => !data.draft);
-	return all.find((cs) => cs.data.project === projectSlug) ?? null;
+	return all
+		.filter((cs) => cs.data.project === projectSlug)
+		.sort((a, b) => b.data.pubDate.getTime() - a.data.pubDate.getTime());
 }
 
 export interface ResolvedExample {

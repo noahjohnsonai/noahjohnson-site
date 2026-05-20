@@ -62,7 +62,3 @@ It also became the first real test of a workflow I want to write about: pair-pro
 [github.com/noahjohnsonai/noahjohnson-site](https://github.com/noahjohnsonai/noahjohnson-site)
 
 The code and content here are © Noah Johnson. All rights reserved. You're welcome to read, link, and share excerpts with attribution. Any other use — copying, modifying, redistributing, or building on this work, commercially or otherwise — requires written permission. Reach out at [noah@noahjohnson.ai](mailto:noah@noahjohnson.ai).
-
-## Case study coming
-
-A long-form write-up on how this got built (the back-and-forth pair-programming with Claude Code, dead-ends, deliberate scope cuts, the moments where the agent surprised me, what I'd do differently) is coming as a blog post. The `Hello world` placeholder will be replaced with it shortly.

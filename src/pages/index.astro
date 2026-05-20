@@ -2,10 +2,11 @@
 import Layout from '../layouts/Layout.astro';
 import WelcomeHero from '../components/WelcomeHero.astro';
 import SessionList from '../components/SessionList.astro';
-import { getSortedPosts, getSortedProjects } from '../lib/data.ts';
+import { getSortedPosts, getSortedProjects, getSortedCaseStudies } from '../lib/data.ts';
 
 const posts = (await getSortedPosts()).slice(0, 6);
 const projects = (await getSortedProjects()).slice(0, 4);
+const caseStudies = (await getSortedCaseStudies()).slice(0, 4);
 ---
 
 <Layout
@@ -13,6 +14,11 @@ const projects = (await getSortedProjects()).slice(0, 4);
 >
 	<WelcomeHero />
 	<SessionList heading="Recent Sessions" entries={posts} collection="posts" />
+	{caseStudies.length > 0 && (
+		<div class="mt-8">
+			<SessionList heading="Case Studies" entries={caseStudies} collection="case-studies" />
+		</div>
+	)}
 	{projects.length > 0 && (
 		<div class="mt-8">
 			<SessionList heading="Projects" entries={projects} collection="projects" />
