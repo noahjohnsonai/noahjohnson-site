@@ -1,18 +1,29 @@
 ---
+// Right panel: always rendered. State (open/closed + width) lives in
+// localStorage so it survives navigations and reloads. Drag the left
+// edge to resize between 240px and 600px.
+//
+// Content (filename + markdown body) is injected at runtime by Layout
+// from a per-page <script id="rp-page-data" type="application/json">.
+// Pages WITH markdown update the panel; pages WITHOUT markdown leave
+// whatever was last loaded in place.
 interface Props {
 	rawMarkdown?: string;
 	filename?: string;
 }
 const { rawMarkdown = '', filename = '' } = Astro.props;
 const hasContent = rawMarkdown.trim().length > 0;
-const displayFilename = filename || 'no-source.md';
 ---
 
-{/*
-  Right panel: always rendered. State (open/closed + width) lives in
-  localStorage so it survives navigations and reloads. Drag the left
-  edge to resize between 240px and 600px.
-*/}
+{/* Per-page data — read by Layout JS to update the panel on navigation */}
+{hasContent && (
+	<script
+		type="application/json"
+		id="rp-page-data"
+		set:html={JSON.stringify({ filename: filename || 'content.md', content: rawMarkdown })}
+	/>
+)}
+
 <aside
 	id="rightpanel"
 	class="rightpanel shrink-0 flex flex-col bg-bg-elevated border-l border-border-soft overflow-hidden relative"
@@ -40,7 +51,9 @@ const displayFilename = filename || 'no-source.md';
 				<svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="text-fg-muted shrink-0" aria-hidden="true">
 					<path d="M3 2h6l3 3v7a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V3a1 1 0 0 1 1-1ZM9 2v3h3" />
 				</svg>
-				<span class="font-mono text-[13px] text-fg-muted truncate">{displayFilename}</span>
+				<span id="rp-filename" class="font-mono text-[13px] text-fg-muted truncate">
+					{filename || 'no-source.md'}
+				</span>
 			</div>
 			<button
 				type="button"
@@ -54,15 +67,17 @@ const displayFilename = filename || 'no-source.md';
 			</button>
 		</div>
 
-		{hasContent ? (
-			<pre class="flex-1 overflow-auto p-4 m-0 text-[13px] leading-relaxed font-mono text-fg-muted whitespace-pre-wrap break-words bg-bg-elevated">{rawMarkdown}</pre>
-		) : (
-			<div class="flex-1 flex flex-col items-center justify-center px-6 text-center text-fg-dim text-[13px] gap-2">
-				<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="opacity-60" aria-hidden="true">
-					<path d="M4 6h16M4 10h16M4 14h10M4 18h10" />
-				</svg>
-				<p class="m-0 leading-relaxed">No source for this page.<br/>Open a post or project to see its markdown.</p>
-			</div>
-		)}
+		<div id="rp-body" class="flex-1 overflow-auto bg-bg-elevated">
+			{hasContent ? (
+				<pre class="m-0 p-4 text-[13px] leading-relaxed font-mono text-fg-muted whitespace-pre-wrap break-words">{rawMarkdown}</pre>
+			) : (
+				<div class="h-full flex flex-col items-center justify-center px-6 text-center text-fg-dim text-[13px] gap-2">
+					<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="opacity-60" aria-hidden="true">
+						<path d="M4 6h16M4 10h16M4 14h10M4 18h10" />
+					</svg>
+					<p class="m-0 leading-relaxed">No source for this page.<br/>Open a post or project to see its markdown.</p>
+				</div>
+			)}
+		</div>
 	</div>
 </aside>
