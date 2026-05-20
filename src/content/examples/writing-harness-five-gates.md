@@ -8,7 +8,7 @@ pubDate: 2026-05-20
 
 A drafting-loop specification for AI-assisted writing where the human owns every paragraph and the AI never autonomously produces more than one paragraph at a time.
 
-The harness assumes you have a [voice scaffold](/examples/build-your-own-voice/) in place. Without one, the harness has nothing to constrain itself against. With one, it gives the agent a structured five-gate motion that keeps the draft close to your voice from the first sentence to the last.
+The harness assumes you have a [voice scaffold](/examples/build-your-own-voice.md) in place. Without one, the harness has nothing to constrain itself against. With one, it gives the agent a structured five-gate motion that keeps the draft close to your voice from the first sentence to the last.
 
 ## Pre-gate: the conversation before the draft
 

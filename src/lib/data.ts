@@ -71,9 +71,10 @@ export async function getReferencedExamples(
 	body: string,
 ): Promise<ResolvedExample[]> {
 	if (!body) return [];
-	// Match [text](/examples/<slug>) or [text](/examples/<slug>/) — leading
-	// slash required to disambiguate from relative paths. Capture the slug.
-	const re = /\]\(\/examples\/([a-z0-9-]+)\/?\)/gi;
+	// Match [text](/examples/<slug>), [text](/examples/<slug>/), or
+	// [text](/examples/<slug>.md). Capture the slug. Leading slash required
+	// to disambiguate from relative paths.
+	const re = /\]\(\/examples\/([a-z0-9-]+)(?:\.md)?\/?\)/gi;
 	const slugs: string[] = [];
 	const seen = new Set<string>();
 	let m: RegExpExecArray | null;

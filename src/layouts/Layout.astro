@@ -349,12 +349,16 @@ const recentEntries = [...recentPosts, ...recentProjects];
 				a.addEventListener('click', (e) => {
 					if (e.defaultPrevented) return;
 					if (e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
-					if (!rpCurrent || rpCurrent.examples.length === 0) return;
+					if (rpExamples.length === 0) return;
 					const href = a.getAttribute('href') || '';
-					const m = href.match(/^\/examples\/([a-z0-9-]+)\/?$/i);
+					// Match /examples/<slug>, /examples/<slug>/, or
+					// /examples/<slug>.md — the .md form lets middle-click
+					// and link-copy reach the raw markdown endpoint, while
+					// plain left-click still routes through the drawer.
+					const m = href.match(/^\/examples\/([a-z0-9-]+)(?:\.md)?\/?$/i);
 					if (!m) return;
 					const slug = m[1];
-					const ex = rpCurrent.examples.find((e2) => e2.slug === slug);
+					const ex = rpExamples.find((e2) => e2.slug === slug);
 					if (!ex) return;
 					e.preventDefault();
 					const s = getRPState();

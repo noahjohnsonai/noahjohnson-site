@@ -6,7 +6,7 @@ pubDate: 2026-05-20
 
 # Writer agent template
 
-A drop-in [Claude Code](https://claude.com/code) agent definition that runs the [five-gate writing harness](/examples/writing-harness-five-gates/) against a [voice scaffold](/examples/build-your-own-voice/) you've built privately. Save as `.claude/agents/writer.md` in your project. Adjust the file paths under "Required reading" to match where your scaffold actually lives.
+A drop-in [Claude Code](https://claude.com/code) agent definition that runs the [five-gate writing harness](/examples/writing-harness-five-gates.md) against a [voice scaffold](/examples/build-your-own-voice.md) you've built privately. Save as `.claude/agents/writer.md` in your project. Adjust the file paths under "Required reading" to match where your scaffold actually lives.
 
 This template assumes you've set up the supporting infrastructure: a voice scaffold in a gitignored directory, a content collection for example files, and (optionally) the slash commands that invoke this agent. Without those, the agent will refuse to draft and tell you what's missing.
 

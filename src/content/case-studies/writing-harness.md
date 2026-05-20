@@ -74,13 +74,13 @@ What you buy with five gates is a draft that stayed close to your voice the enti
 
 The harness is a small enough system to lift in pieces. The four take-home artifacts below cover the pieces of the design that are genuinely portable. Click any of them and the file loads in the right-hand drawer of this page. Each one is downloadable as raw markdown, drop-in for your own setup.
 
-The headliner is [build-your-own-voice](/examples/build-your-own-voice/). It walks the method of constructing a voice scaffold from your own writing samples, without ever publishing the scaffold itself. If you take only one of these, take this one. The rest of the harness assumes a voice scaffold to constrain against; without it, the agent is back to guessing.
+The headliner is [build-your-own-voice](/examples/build-your-own-voice.md). It walks the method of constructing a voice scaffold from your own writing samples, without ever publishing the scaffold itself. If you take only one of these, take this one. The rest of the harness assumes a voice scaffold to constrain against; without it, the agent is back to guessing.
 
-[The five-gate writing harness](/examples/writing-harness-five-gates/) is the full drafting-loop spec, lifted into a standalone artifact. Five gates: setup, outline, per-paragraph, take-home discovery, voice check. Sequencing rules included. Use this as a reference when implementing your own agent or as a checklist when reviewing AI-drafted prose generally.
+[The five-gate writing harness](/examples/writing-harness-five-gates.md) is the full drafting-loop spec, lifted into a standalone artifact. Five gates: setup, outline, per-paragraph, take-home discovery, voice check. Sequencing rules included. Use this as a reference when implementing your own agent or as a checklist when reviewing AI-drafted prose generally.
 
-[The writer agent template](/examples/writer-agent-template/) is the actual Claude Code agent definition that drives the loop. Generalized, no project-specific paths. Drop it in `.claude/agents/writer.md` in your own project, point its required-reading section at your voice scaffold directory, and you have a working five-gate writer.
+[The writer agent template](/examples/writer-agent-template.md) is the actual Claude Code agent definition that drives the loop. Generalized, no project-specific paths. Drop it in `.claude/agents/writer.md` in your own project, point its required-reading section at your voice scaffold directory, and you have a working five-gate writer.
 
-[The case-study content collection setup](/examples/case-study-content-collection-setup/) is the Astro scaffold that makes the case studies + project cross-link work on this site. Useful if you're running Astro and want a paired collection that enforces a 1:1 relationship at build time and auto-renders cross-link chips on both sides.
+[The case-study content collection setup](/examples/case-study-content-collection-setup.md) is the Astro scaffold that makes the case studies + project cross-link work on this site. Useful if you're running Astro and want a paired collection that enforces a 1:1 relationship at build time and auto-renders cross-link chips on both sides.
 
 None of these include the actual voice files. The voice stays private; the apparatus is public.
 
