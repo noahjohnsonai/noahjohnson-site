@@ -50,7 +50,8 @@ const { href, title, slug, meta, active = false, featured = false } = Astro.prop
 </li>
 
 <style is:global>
-	/* Two-state status dot, controlled by data-visited (set by Layout JS). */
+	/* Two-state status dot, controlled by data-visited (set by Layout JS).
+	   Hover tooltip text differs by state: "New" (unvisited) / "Viewed" (visited). */
 	.sidebar-dot {
 		position: relative;
 		background: var(--color-accent-soft);
@@ -60,10 +61,10 @@ const { href, title, slug, meta, active = false, featured = false } = Astro.prop
 		background: transparent;
 		border-color: var(--color-fg-dim);
 	}
-	/* "Viewed" pill on hover of the visited-state dot. Matches the
-	   ScrollProgress tooltip treatment for visual consistency. */
-	.sidebar-dot[data-visited="1"]::after {
-		content: "Viewed";
+	/* Hover pill — shared positioning/style. Matches the ScrollProgress
+	   tooltip treatment for visual consistency. Text varies by state. */
+	.sidebar-dot::after {
+		content: "New";
 		position: absolute;
 		left: 50%;
 		bottom: calc(100% + 6px);
@@ -81,7 +82,10 @@ const { href, title, slug, meta, active = false, featured = false } = Astro.prop
 		transition: opacity 120ms ease;
 		z-index: 50;
 	}
-	.sidebar-dot[data-visited="1"]:hover::after {
+	.sidebar-dot[data-visited="1"]::after {
+		content: "Viewed";
+	}
+	.sidebar-dot:hover::after {
 		opacity: 1;
 	}
 </style>
