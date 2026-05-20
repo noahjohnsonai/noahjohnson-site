@@ -1,6 +1,7 @@
 ---
 import Layout from './Layout.astro';
 import Prose from '../components/Prose.astro';
+import ScrollProgress from '../components/ScrollProgress.astro';
 import { formatAbsoluteDate, formatMonthYear, readingTimeMinutes } from '../lib/data.ts';
 
 interface ExampleRef {
@@ -23,7 +24,8 @@ interface Props {
 	examples?: ExampleRef[];
 	cover?: string;     // hero image path under public/
 	coverAlt?: string;  // hero image alt text
-	dateFormat?: 'full' | 'month-year';
+	showProgress?: boolean; // render the scroll-progress tick timeline (default true)
+	dateFormat?: 'full' | 'month-year'; // 'month-year' default — calendar-day on posts/case-studies is too precise
 }
 const {
 	title,
@@ -38,7 +40,8 @@ const {
 	examples = [],
 	cover,
 	coverAlt,
-	dateFormat = 'full',
+	showProgress = true,
+	dateFormat = 'month-year',
 } = Astro.props;
 
 const readMinutes = rawMarkdown ? readingTimeMinutes(rawMarkdown) : 0;
@@ -64,6 +67,7 @@ const breadcrumbs =
 	rawFilename={rawFilename}
 	examples={examples}
 >
+	{showProgress && <ScrollProgress />}
 	<article>
 		{cover && (
 			<figure class="post-hero -mt-6 mb-8">

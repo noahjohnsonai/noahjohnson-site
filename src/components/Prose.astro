@@ -149,6 +149,43 @@
 		color: var(--color-fg-muted);
 	}
 
+	/* TLDR callout: the first ## TLDR heading + its body paragraphs get a
+	   distinct treatment so it reads as a summary card, not just another
+	   section. Tagged by the rehypeTldrCallout plugin in astro.config.mjs. */
+	.prose h2.tldr-heading {
+		font-size: 0.75rem;
+		font-weight: 600;
+		letter-spacing: 0.08em;
+		text-transform: uppercase;
+		color: var(--color-accent);
+		margin: 0 0 0.5em;
+		padding: 0;
+		border: none;
+	}
+	.prose .tldr-body {
+		color: var(--color-fg-muted);
+		font-size: 0.95em;
+		margin: 0 0 0.6em;
+	}
+	/* Wrap the heading + body in a visually distinct callout. We can't add a
+	   real wrapper without a more involved plugin, so we fake it with a
+	   pseudo-block: a left border + padding on the heading that extends
+	   downward through following .tldr-body paragraphs via margin tricks. */
+	.prose h2.tldr-heading,
+	.prose .tldr-body {
+		border-left: 3px solid var(--color-accent);
+		padding-left: 1em;
+		margin-left: 0;
+	}
+	.prose h2.tldr-heading {
+		padding-top: 1em;
+		margin-top: 0;
+	}
+	.prose .tldr-body:last-of-type {
+		padding-bottom: 1em;
+		margin-bottom: 2em;
+	}
+
 	/* Project-page thumbnail size override.
 	   Higher specificity than `.prose img` above so it wins inside the
 	   project content wrapper. */

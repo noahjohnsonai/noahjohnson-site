@@ -1,0 +1,239 @@
+---
+// Vertical scroll progress timeline. Sits on the left edge of the main
+// content column. One tick mark per article H2 section. Current section's
+// tick is filled with the accent color; others are outlined. Hover any
+// tick to see its section name in a tooltip.
+//
+// Implementation: IntersectionObserver-based scroll-spy. The component
+// scans the article for H2 elements at runtime (after astro:page-load)
+// and builds the tick list dynamically — so it works for any article
+// without per-page configuration.
+//
+// Hidden below lg breakpoint (mobile gets nothing — saves space).
+---
+
+<aside
+	id="scroll-progress"
+	class="scroll-progress hidden lg:block fixed top-1/2 -translate-y-1/2 z-20"
+	aria-label="Article progress"
+>
+	<div class="sp-anchor relative pointer-events-auto" style="height: min(70vh, 600px); width: 16px;">
+		<div class="sp-line absolute top-0 bottom-0 left-1/2 -translate-x-1/2 w-px bg-border-soft"></div>
+		<ul id="sp-ticks" class="relative h-full m-0 p-0 list-none">
+			{/* Ticks injected by JS at runtime. */}
+		</ul>
+	</div>
+</aside>
+
+<style is:global>
+	#scroll-progress {
+		/* Initial fallback. JS overrides with the actual article left edge minus 24px. */
+		left: 16px;
+	}
+	#sp-ticks li {
+		position: absolute;
+		left: 50%;
+		transform: translateX(-50%);
+		display: flex;
+		align-items: center;
+		gap: 8px;
+	}
+	#sp-ticks button {
+		appearance: none;
+		background: transparent;
+		border: 1px solid var(--color-border, #555);
+		width: 7px;
+		height: 7px;
+		border-radius: 50%;
+		padding: 0;
+		cursor: pointer;
+		transition: background-color 160ms ease, border-color 160ms ease, transform 160ms ease;
+	}
+	#sp-ticks button:hover,
+	#sp-ticks li.is-active button {
+		background-color: var(--color-accent, #D97757);
+		border-color: var(--color-accent, #D97757);
+		transform: scale(1.25);
+	}
+	#sp-ticks button:focus-visible {
+		outline: 2px solid var(--color-accent, #D97757);
+		outline-offset: 3px;
+	}
+	/* Labels are hover-only — the article H2 below tells the reader where
+	   they are; the timeline just provides scannable progress + jump.
+	   Labels appear as a small popover left of the dot on hover. */
+	#sp-ticks .sp-label {
+		position: absolute;
+		right: 16px;
+		top: 50%;
+		transform: translateY(-50%) translateX(4px);
+		width: max-content;
+		max-width: 180px;
+		text-align: right;
+		font-size: 11px;
+		line-height: 1.35;
+		color: var(--color-fg, #ddd);
+		opacity: 0;
+		background: var(--color-bg-elevated, #1c1814);
+		border: 1px solid var(--color-border-soft, #2a241e);
+		padding: 4px 8px;
+		border-radius: 6px;
+		transition: opacity 160ms ease, transform 160ms ease;
+		pointer-events: none;
+		word-break: normal;
+		overflow-wrap: break-word;
+	}
+	#sp-ticks li:hover .sp-label {
+		opacity: 1;
+		transform: translateY(-50%) translateX(0);
+	}
+</style>
+
+<script>
+	function initScrollProgress() {
+		const root = document.getElementById('scroll-progress');
+		const ticksEl = document.getElementById('sp-ticks');
+		if (!root || !ticksEl) return;
+
+		// Find article H2s. Scope to the main article container — fall back
+		// to all H2s if no <article> is on the page.
+		const article = document.querySelector('article') ?? document.querySelector('main');
+		const headings = Array.from(article?.querySelectorAll('h2') ?? []) as HTMLHeadingElement[];
+
+		// No headings = no progress timeline. Hide and bail.
+		if (headings.length < 2) {
+			root.style.display = 'none';
+			return;
+		}
+		root.style.display = '';
+
+		// Position the timeline in the gutter between the sidebar and the
+		// article. Compute target as article-left - 28, clamp so the
+		// timeline never overlaps the sidebar's right edge.
+		const positionTimeline = () => {
+			const rect = (article as HTMLElement)?.getBoundingClientRect();
+			if (!rect) return;
+			const sidebar = document.getElementById('sidebar');
+			const sbRight = sidebar?.getBoundingClientRect().right ?? 0;
+			const target = rect.left - 28;
+			const left = Math.max(sbRight + 4, target);
+			root.style.left = `${left}px`;
+		};
+		positionTimeline();
+		const onResize = () => {
+			positionTimeline();
+			repositionTicks();
+		};
+		if ((window as any).__sp_resize) window.removeEventListener('resize', (window as any).__sp_resize);
+		(window as any).__sp_resize = onResize;
+		window.addEventListener('resize', onResize);
+
+		// Give each heading a stable id we can scroll to.
+		headings.forEach((h, i) => {
+			if (!h.id) {
+				const slug = (h.textContent || `section-${i}`)
+					.toLowerCase()
+					.replace(/[^a-z0-9]+/g, '-')
+					.replace(/^-+|-+$/g, '');
+				h.id = slug || `section-${i}`;
+			}
+		});
+
+		// Build the tick list. Tick positions are placeholder; the real
+		// positioning happens in repositionTicks() which proportionally
+		// maps each heading to its actual scroll position in the article.
+		ticksEl.innerHTML = '';
+		headings.forEach((h) => {
+			const li = document.createElement('li');
+			li.dataset.headingId = h.id;
+			const btn = document.createElement('button');
+			btn.type = 'button';
+			btn.setAttribute('aria-label', `Jump to ${h.textContent?.trim()}`);
+			btn.addEventListener('click', () => {
+				document.getElementById(h.id)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+			});
+			const label = document.createElement('span');
+			label.className = 'sp-label';
+			label.textContent = h.textContent?.trim() || '';
+			li.appendChild(btn);
+			li.appendChild(label);
+			ticksEl.appendChild(li);
+		});
+
+		// Position ticks proportionally to where their heading actually sits
+		// in the article's scroll length, not by index. Longer sections get
+		// bigger gaps between dots, reflecting real article geography.
+		const ticks = Array.from(ticksEl.children) as HTMLElement[];
+		const repositionTicks = () => {
+			const articleEl = article as HTMLElement;
+			if (!articleEl) return;
+			const articleHeight = articleEl.offsetHeight;
+			if (articleHeight === 0) return;
+			headings.forEach((h, i) => {
+				// offsetTop is relative to the nearest positioned ancestor.
+				// Walk up to compute the heading's offset within the article.
+				let top = 0;
+				let el: HTMLElement | null = h;
+				while (el && el !== articleEl) {
+					top += el.offsetTop;
+					el = el.offsetParent as HTMLElement | null;
+				}
+				const pct = Math.min(100, Math.max(0, (top / articleHeight) * 100));
+				const li = ticks[i];
+				li.style.top = `${pct}%`;
+				li.style.transform = `translate(-50%, ${pct === 0 ? '0%' : pct === 100 ? '-100%' : '-50%'})`;
+			});
+		};
+		repositionTicks();
+
+		// Mark active section based on scroll position.
+		const items = ticks;
+		const setActive = (id: string) => {
+			items.forEach((li) => {
+				li.classList.toggle('is-active', li.dataset.headingId === id);
+			});
+		};
+
+		// The page scrolls inside <main>, not window — bind there.
+		const scroller = document.getElementById('main') as HTMLElement | null;
+		const scrollEl = scroller ?? window;
+		let raf = 0;
+		const update = () => {
+			raf = 0;
+			// End-of-scroll snap: when within 8px of the bottom, force the
+			// last heading active. This handles the case where the document
+			// can't scroll far enough to push the final heading above the
+			// normal threshold (common for short final sections).
+			if (scroller) {
+				const atEnd = scroller.scrollTop + scroller.clientHeight >= scroller.scrollHeight - 8;
+				if (atEnd) {
+					setActive(headings[headings.length - 1].id);
+					return;
+				}
+			}
+			const threshold = window.innerHeight * 0.3;
+			let active = headings[0].id;
+			for (const h of headings) {
+				const rect = h.getBoundingClientRect();
+				if (rect.top <= threshold) active = h.id;
+				else break;
+			}
+			setActive(active);
+		};
+		const onScroll = () => {
+			if (raf) return;
+			raf = requestAnimationFrame(update);
+		};
+		// Bind once on the actual scroll container (replace handler if re-init).
+		const prev = (window as any).__sp_scroll;
+		const prevScroller = (window as any).__sp_scroller;
+		if (prev && prevScroller) prevScroller.removeEventListener('scroll', prev);
+		(window as any).__sp_scroll = onScroll;
+		(window as any).__sp_scroller = scroller;
+		scroller.addEventListener('scroll', onScroll, { passive: true });
+		update();
+	}
+
+	initScrollProgress();
+	document.addEventListener('astro:page-load', initScrollProgress);
+</script>
