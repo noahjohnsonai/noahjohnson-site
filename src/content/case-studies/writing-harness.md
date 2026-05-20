@@ -34,6 +34,18 @@ A pivot worth flagging: I built the voice scaffold inside a private, gitignored 
 
 By the time the voice work was done, the dominant motion of the project was already grilling. Every load-bearing decision had been surfaced as a question with a recommendation, alternatives, and an explicit escape hatch. The voice corpus was approved by grill. The style profile shapes were locked by grill. The list of things the voice should never do (the don'ts) was negotiated one question at a time. By the time it came to actually wire up the article-drafting flow, the natural shape was obvious. The writer agent didn't need to invent a new motion. It inherited the one the project had already been built on.
 
+## The conversation before the draft
+
+Before any gate fires, there is a conversation.
+
+When I start a new piece, I don't hand the agent a topic and watch it draft. I talk to it about what the piece is supposed to *be*. What's bothering me about the topic. What I think the wrong belief is. What I want to push back on. What I want to make a reader notice. Sometimes I type. Sometimes I dictate into speech-to-text and paste the transcript. Sometimes it's a few rounds of "no, that's not what I meant" before the actual subject of the piece becomes clear. The agent's job during this phase is not to draft. It's to listen and synthesize.
+
+What the agent produces from that conversation is not prose. It's a set of candidate framings for the piece: three or four possible tensions, three or four possible angles, sometimes a few candidate titles. Each one gets surfaced as a real choice. The author picks one. That choice becomes the spine of the outline that Gate 2 will eventually lock.
+
+The conversation also produces something less visible: the per-piece *direction-setting* that doesn't fit into the dial-picking of Gate 1. When I wrote this article, I gave three specific directions before the first paragraph was drafted: write as if the project is complete, be vague about counts of corpus samples, frame the closer forward-looking instead of as gaps to fill. None of those are archetype or audience or style profile choices. They are piece-shape decisions that came out of the conversation and rode along with the outline through every subsequent gate.
+
+The dictation part matters. Typing is the chat-channel register; dictation is closer to the spoken-talk register and surfaces different material. A topic I would describe in three terse typed sentences becomes five paragraphs of meandering dictation, and the agent has more to work with. Most of the meandering doesn't make it into the piece. The shape of the meandering does.
+
 ## The five gates
 
 The harness, in mechanical terms, is five grilling gates spaced across a drafting session.
@@ -64,12 +76,8 @@ The headliner is [build-your-own-voice](/examples/build-your-own-voice/). It wal
 
 None of these include the actual voice files. The voice stays private; the apparatus is public.
 
-## What we're watching for
+## Where this is going
 
-A few things we'll be paying attention to as we use the harness on more pieces.
+What's exciting about this kind of tooling is how rapidly it's evolving, and how much remains to be discovered about what AI-augmented writing can actually do. The harness described here is one shape, and tomorrow's iteration will be a different shape. The five gates might collapse into three. Voice scaffolds might become something the agent learns continuously instead of something the author calibrates upfront. The conversation before the draft might stop being a separate phase entirely.
 
-The first is whether the don'ts list in DEFAULT stays right. Eight specific don'ts is a small enough list to enforce reliably, and a small enough list that it should keep evolving as we learn what *actually* breaks voice in published prose versus what just feels wrong in the abstract. The risk is the opposite of incompleteness: that the list calcifies into orthodoxy, and we stop noticing real violations because we've stopped looking outside the rules we've already written down.
-
-The second is whether the per-paragraph gate stays load-bearing. The slowness is the point right now. But it's possible that as more pieces run through the harness, the agent's first-paragraph drafts get good enough that the Keep button starts firing almost reflexively. If that happens, the gate has stopped doing work. We'll be watching for the moment grilling becomes ceremonial, and we'll change the loop when it does.
-
-The third is whether the take-home discovery actually produces artifacts that *anyone else* uses. Generalized files are easy to write and easy to never read again. The honest test is whether the take-home files this article ships with show up in someone else's repo a year from now. We don't know yet. Worth watching.
+What stays load-bearing is the underlying motion: the human owns the voice and the structure, and the agent does the heavy lifting inside those constraints. As tools like this mature, that arrangement becomes more *comfortable*, not less. Writers who learn to direct AI-augmented drafting with this kind of precision are doing something genuinely new, and the work compounds. This is the direction the work is moving, and the harness is what the direction looks like today.

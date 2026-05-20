@@ -10,6 +10,18 @@ A drafting-loop specification for AI-assisted writing where the human owns every
 
 The harness assumes you have a [voice scaffold](/examples/build-your-own-voice/) in place. Without one, the harness has nothing to constrain itself against. With one, it gives the agent a structured five-gate motion that keeps the draft close to your voice from the first sentence to the last.
 
+## Pre-gate: the conversation before the draft
+
+Before any gate fires, there is a conversation. The setup grill picks dials; this phase produces the substance.
+
+The agent invites a topic conversation: *"Talk through the piece with me. What's bothering you about the topic? What's the wrong belief you're pushing back on? What do you want a reader to walk away with?"* Typing or dictation are both fine. If the author pastes a speech-to-text transcript, the meandering is feature, not noise.
+
+The agent does not draft during this phase. It listens and synthesizes. From the conversation, it produces a set of candidate framings (3–4 possible tensions, angles, or titles) and surfaces them as a single multi-option question. The author picks one. That choice becomes the spine of the outline that Gate 2 will lock.
+
+The conversation also captures per-piece direction-setting that doesn't fit into the dial-picking of Gate 1: instructions like *"write as if the project is complete"* or *"be vague about counts"* or *"frame the closer forward-looking"*. These get recorded explicitly and re-surfaced at each subsequent gate so they ride along through the whole drafting motion.
+
+If the author hands the agent a topic and says "just go" without conversation, the agent surfaces that as a choice: *"Want to talk through the piece first, or go straight to the setup grill?"* Both are valid; defaulting to the conversation produces sharper outlines.
+
 ## The five gates
 
 ### Gate 1: Setup
@@ -71,6 +83,7 @@ Each violation is surfaced verbatim with the rule cited. The author decides whet
 
 ## Sequencing rules
 
+- **The pre-gate conversation runs first.** The author can opt out of it ("just go to the setup grill") but the agent always offers it. Skipping the conversation tends to produce outlines that drift mid-piece.
 - **Gates are sequential.** You cannot enter Gate 3 without passing Gate 2.
 - **Refine and Rewrite within a gate are unlimited**, but each attempt counts. If you've Refined a paragraph more than three times, the beat is probably wrong, not the paragraph. Back up to Gate 2 and revisit the outline.
 - **Skip is a real option, not a polite fiction.** If a paragraph isn't earning its place, it doesn't go in. The Skip option exists because the writer agent's tendency is to defend its own output. Skip breaks that loop.
