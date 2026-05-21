@@ -26,6 +26,7 @@ interface Props {
 	coverAlt?: string;  // hero image alt text
 	showProgress?: boolean; // render the scroll-progress tick timeline (default true)
 	dateFormat?: 'full' | 'month-year'; // 'month-year' default — calendar-day on posts/case-studies is too precise
+	minimalHeader?: boolean; // hide visible description + meta row (date, read time, tags). SEO description still emitted.
 }
 const {
 	title,
@@ -42,6 +43,7 @@ const {
 	coverAlt,
 	showProgress = true,
 	dateFormat = 'month-year',
+	minimalHeader = false,
 } = Astro.props;
 
 const readMinutes = rawMarkdown ? readingTimeMinutes(rawMarkdown) : 0;
@@ -84,10 +86,10 @@ const breadcrumbs =
 			<h1 class="text-2xl sm:text-3xl font-semibold tracking-tight text-fg leading-tight m-0 mb-2">
 				{title}
 			</h1>
-			{description && (
+			{description && !minimalHeader && (
 				<p class="text-fg-muted text-base m-0 mb-4">{description}</p>
 			)}
-			<div class="flex flex-wrap items-center gap-x-3 gap-y-2 text-xs text-fg-dim">
+			{!minimalHeader && <div class="flex flex-wrap items-center gap-x-3 gap-y-2 text-xs text-fg-dim">
 				{pubDate && (
 					<time datetime={pubDate.toISOString()}>
 						{fmt(pubDate)}
@@ -122,7 +124,7 @@ const breadcrumbs =
 						</ul>
 					</>
 				)}
-			</div>
+			</div>}
 		</header>
 		<slot name="belowHeader" />
 		<Prose>
