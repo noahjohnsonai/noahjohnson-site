@@ -1,9 +1,9 @@
 ---
-title: Household-Management SaaS with AI Inbox Ingest
-description: A relational household-management SaaS that pre-populates from your inbox.
+title: Personal Household Manager with AI Inbox Ingest
+description: A personal-use household manager that pre-populates itself from your inbox.
 pubDate: 2026-05-15
 tags:
-  - saas
+  - personal-project
   - ai-extraction
   - eval-driven-development
   - building-in-public
@@ -42,11 +42,11 @@ skills:
 
 ## What
 
-A relational household-management SaaS where the first-login experience is hundreds of pre-extracted items — receipts, warranties, subscriptions, service history, school mail, insurance — pulled from a read-only inbox connection rather than a blank account.
+A personal household manager where the first-login experience is hundreds of pre-extracted items — receipts, warranties, subscriptions, service history, school mail, insurance — pulled from a read-only inbox connection rather than a blank account.
 
 ## Why
 
-Personal-CRM and household-org tools share one cold-start problem: nobody fills in their own data. Most of what belongs in one is already sitting in an inbox. The hard part isn't the extraction — it's earning trust at the trust boundary, where the raw email body is never persisted, medical mail is metadata-only, and the OAuth scope stays read-only forever.
+Most of what belongs in a household-organization tool is already sitting in an inbox, but nobody fills in their own data by hand. The interesting work isn't the extraction — it's earning trust at the trust boundary, where the raw email body is never persisted, medical mail is metadata-only, and the OAuth scope stays read-only forever.
 
 ## Stack at a glance
 
@@ -61,4 +61,4 @@ Personal-CRM and household-org tools share one cold-start problem: nobody fills 
 
 ## How it's built
 
-A six-agent governance harness — PM, design, frontend, backend, extraction, and trust-ops — with a hard-rule set enforced in CI. The defining one: every locked extractor version is eval-gated, with per-field regression against a stored baseline blocking the commit. Local-first development through the MVP, cloud cutover at beta.
+A six-agent governance harness — PM, design, frontend, backend, extraction, and trust-ops — with a hard-rule set enforced in CI. The defining one: every locked extractor version is eval-gated, with per-field regression against a stored baseline blocking the commit.
