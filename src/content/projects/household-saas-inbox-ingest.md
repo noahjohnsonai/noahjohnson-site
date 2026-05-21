@@ -57,7 +57,7 @@ Personal-CRM and household-org tools share one cold-start problem: nobody fills 
 - **[Anthropic Claude](https://www.anthropic.com/claude) via the [Vercel AI SDK](https://sdk.vercel.ai)** — extractors at the trust boundary
 - **[Resend](https://resend.com) + [Sentry](https://sentry.io)** — transactional mail and observability
 - **[Vitest](https://vitest.dev) with pglite + [Playwright](https://playwright.dev)** — RLS-aware unit specs and end-to-end smoke
-- **Hosted on [Vercel](https://vercel.com)**, local-first dev through the MVP, cloud cutover at beta
+- **Hosted on [Vercel](https://vercel.com)**
 
 ## How it's built
 
