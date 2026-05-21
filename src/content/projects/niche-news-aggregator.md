@@ -65,4 +65,4 @@ Niche developer communities lose news to the same shape every time: a sprawling 
 
 ## How it's built
 
-Built with Claude Code under a hard-rule set centered on the auth boundary: RLS is the only auth gate, Server Actions return discriminated unions and never throw across the boundary, every input is zod-validated, design tokens only (no hex or px in components), append-only migrations, admin routes gated, every admin mutation audited. Tiered build with a security gate at every tier-ship.
+A hard-rule set centered on the auth boundary: RLS is the only auth gate, Server Actions return discriminated unions and never throw across the boundary, every input is zod-validated, design tokens only (no hex or px in components), append-only migrations, admin routes gated, every admin mutation audited. Tiered build with a security gate at every tier-ship.

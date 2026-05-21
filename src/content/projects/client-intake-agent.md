@@ -59,4 +59,4 @@ Pre-engagement intake is the single most expensive thing a service business does
 
 ## How it's built
 
-Built with Claude Code under a four-agent governance harness — PM, backend, frontend, trust-ops — with a hard-rule set focused on security posture: server-authoritative session state, no PII in URLs, no in-chat brief rendering, an invisible system prompt, user input treated as data and never as instruction, ZDR-tier required on the model endpoint. All firm-identity strings flow through a single brand config so the same codebase can be re-skinned cleanly.
+A four-agent governance harness — PM, backend, frontend, trust-ops — with a hard-rule set focused on security posture: server-authoritative session state, no PII in URLs, no in-chat brief rendering, an invisible system prompt, user input treated as data and never as instruction, ZDR-tier required on the model endpoint. All firm-identity strings flow through a single brand config so the same codebase can be re-skinned cleanly.

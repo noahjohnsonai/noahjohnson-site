@@ -61,4 +61,4 @@ Personal-CRM and household-org tools share one cold-start problem: nobody fills 
 
 ## How it's built
 
-Built with Claude Code under a six-agent governance harness — PM, design, frontend, backend, extraction, and trust-ops — and a hard-rule set enforced in CI. The defining one: every locked extractor version is eval-gated, with per-field regression against a stored baseline blocking the commit. Local-first development through the MVP, cloud cutover at beta.
+A six-agent governance harness — PM, design, frontend, backend, extraction, and trust-ops — with a hard-rule set enforced in CI. The defining one: every locked extractor version is eval-gated, with per-field regression against a stored baseline blocking the commit. Local-first development through the MVP, cloud cutover at beta.

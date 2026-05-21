@@ -45,4 +45,4 @@ The roguelite shape forces every system to be playable in isolation, which makes
 
 ## How it's built
 
-Built with Claude Code under a hard-rule set centered on agent-runnable verification: no design where only a human can tell whether the system worked. TDD is mandatory for gameplay-core surfaces — combat math, ability resolution, boon application — while UI and scene authoring are exempt. A PM agent owns governance documents and ratifies decisions from the other agents into an append-only log.
+A hard-rule set centered on agent-runnable verification: no design where only a human can tell whether the system worked. TDD is mandatory for gameplay-core surfaces — combat math, ability resolution, boon application — while UI and scene authoring are exempt. A PM agent owns governance documents and ratifies decisions from the other agents into an append-only log.
