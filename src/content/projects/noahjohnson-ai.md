@@ -43,7 +43,7 @@ It also became the first real test of a workflow I want to write about: pair-pro
 - **[Geist + Geist Mono](https://vercel.com/font)** — variable fonts, self-hosted
 - **[Pagefind](https://pagefind.app)** — search index built at deploy time, modal triggered by ⌘K / Ctrl K
 - **No client framework** — vanilla JS for the interactive bits (drawer toggle, resize, content tracking)
-- **Hosted on [Vercel](https://vercel.com)**, domain via [GoDaddy](https://godaddy.com)
+- **Hosted on [Vercel](https://vercel.com)**
 
 ## What's actually in here
 
