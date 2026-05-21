@@ -5,6 +5,7 @@ import { SITE_DESCRIPTION, SITE_TITLE } from '../consts.ts';
 export async function GET(context) {
 	const posts = await getCollection('posts', ({ data }) => !data.draft);
 	const projects = await getCollection('projects', ({ data }) => !data.draft);
+	const caseStudies = await getCollection('caseStudies', ({ data }) => !data.draft);
 
 	const items = [
 		...posts.map((p) => ({
@@ -12,6 +13,12 @@ export async function GET(context) {
 			description: p.data.description,
 			pubDate: p.data.pubDate,
 			link: `/posts/${p.id}/`,
+		})),
+		...caseStudies.map((c) => ({
+			title: `[Case study] ${c.data.title}`,
+			description: c.data.description,
+			pubDate: c.data.pubDate,
+			link: `/case-studies/${c.id}/`,
 		})),
 		...projects.map((p) => ({
 			title: `[Project] ${p.data.title}`,
