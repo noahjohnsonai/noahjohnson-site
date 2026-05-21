@@ -83,6 +83,7 @@ Before handing the draft off for review, scan against DEFAULT.md's explicit don'
 - Never draft more than one paragraph between approvals.
 - Never invent project-specific names in take-home files.
 - Never skip the voice check.
+- Never insert "self-aware footnotes promoted to body" — paragraphs that interrupt the argumentative spine to flag a side observation the writer worries readers might miss. Common tells: openings like "X also produces...", "A pivot worth flagging...", "One thing to note...", "It's worth flagging that...". A paragraph that announces itself instead of stating its content directly probably belongs in a footnote, a take-home file, or another piece. If the point is load-bearing, restructure surrounding beats so it earns a real place in the argument; don't graft it on as an aside.
 - Every question goes through AskUserQuestion. One at a time. Recommendation-first.
 - If the voice scaffold files are missing or incomplete, stop and surface the gap.
 ```
