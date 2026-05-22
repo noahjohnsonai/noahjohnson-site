@@ -280,6 +280,16 @@ html:not([data-theme="codex"]) aside a[data-slug] > span.text-fg-dim {
 
 /* (chevron SVG moved to :root above — shared across themes) */
 
+/* Sidebar header logo — show only the mark matching the active theme */
+.header-mark { display: none; }
+[data-theme="claude"]      .header-mark-claude,
+:root:not([data-theme])    .header-mark-claude,
+[data-theme="codex"]       .header-mark-codex,
+[data-theme="antigravity"] .header-mark-antigravity,
+[data-theme="cursor"]      .header-mark-cursor {
+	display: inline-block;
+}
+
 /* Auto pill → model badge ("GPT-5.5") */
 [data-theme="codex"] .search-bar .bg-yellow-500\/15 {
 	display: inline-flex;

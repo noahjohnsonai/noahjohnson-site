@@ -3,7 +3,6 @@ import { getSortedPosts, getSortedProjects, getSortedCaseStudies } from '../lib/
 import SidebarGroup from './SidebarGroup.astro';
 import SidebarItem from './SidebarItem.astro';
 import UserCard from './UserCard.astro';
-import Spark from './Spark.astro';
 import ThemeSwitcher from './ThemeSwitcher.astro';
 
 const currentPath = Astro.url.pathname.replace(/\/$/, '') || '/';
@@ -37,7 +36,10 @@ function relativeDate(d: Date): string {
 		class="flex items-center gap-2 px-5 py-4 border-b border-border-soft hover:bg-surface no-underline transition-colors"
 		aria-label="Home"
 	>
-		<Spark size={20} class="text-accent" />
+		<img src="/brands/claude.svg"      alt="" width="20" height="20" class="header-mark header-mark-claude shrink-0" />
+		<img src="/brands/codex.svg"       alt="" width="20" height="20" class="header-mark header-mark-codex shrink-0" />
+		<img src="/brands/antigravity.svg" alt="" width="20" height="20" class="header-mark header-mark-antigravity shrink-0" />
+		<img src="/brands/cursor.svg"      alt="" width="20" height="20" class="header-mark header-mark-cursor shrink-0" />
 		<span class="text-[15px] font-medium text-fg truncate">noahjohnson.ai</span>
 	</a>
 
