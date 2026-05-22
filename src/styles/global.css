@@ -1,9 +1,13 @@
 @import "tailwindcss";
 @import "@fontsource-variable/geist";
 @import "@fontsource-variable/geist-mono";
+@import "@fontsource-variable/ibm-plex-sans";
+@import "@fontsource/ibm-plex-mono";
+@import "@fontsource-variable/inter";
+@import "@fontsource-variable/jetbrains-mono";
 
 @theme {
-	/* Palette — matches Claude Code desktop screenshot */
+	/* Default palette — Claude theme (matches Claude Code desktop) */
 	--color-bg:           #1A1A1A;
 	--color-bg-elevated:  #1F1E1D;
 	--color-surface:      #232220;
@@ -17,17 +21,639 @@
 	--color-accent-soft:  #E08A6E;
 	--color-accent-dim:   #8C4A36;
 
-	/* Typography */
+	/* Typography — default (Claude) */
 	--font-sans: "Geist Variable", system-ui, -apple-system, Segoe UI, sans-serif;
 	--font-mono: "Geist Mono Variable", ui-monospace, SFMono-Regular, Menlo, monospace;
 
-	/* Extra breakpoints beyond Tailwind's defaults (sm 640, md 768,
-	   lg 1024, xl 1280, 2xl 1536). These extend reading width on
-	   ultrawide / 4K displays. */
+	/* Chrome tokens — themes can re-skin shell without DOM changes */
+	--color-sidebar-bg:   #1A1A1A;
+	--color-hover:        #2A2825;
+	--radius-base:        0.375rem;
+	--radius-pill:        0.5rem;
+	--sidebar-item-px:    0.75rem;
+	--sidebar-item-py:    0.375rem;
+
+	/* Extra breakpoints beyond Tailwind's defaults */
 	--breakpoint-3xl: 1920px;
 	--breakpoint-4xl: 2560px;
 	--breakpoint-5xl: 3440px;
 }
+
+/* ─── Theme: Codex (ChatGPT / OpenAI-inspired) ───────────────────────
+   Near-black surfaces, neutral grays, OpenAI green accent, IBM Plex type. */
+[data-theme="codex"] {
+	--color-bg:           #0D0D0D;
+	--color-bg-elevated:  #141414;
+	--color-surface:      #1A1A1A;
+	--color-surface-hover:#222222;
+	--color-border:       #2A2A2A;
+	--color-border-soft:  #1E1E1E;
+	--color-fg:           #ECECEC;
+	--color-fg-muted:     #A0A0A0;
+	--color-fg-dim:       #6B6B6B;
+	--color-accent:       #10A37F;
+	--color-accent-soft:  #1FBE94;
+	--color-accent-dim:   #0B6E56;
+
+	--font-sans: "IBM Plex Sans Variable", system-ui, -apple-system, Segoe UI, sans-serif;
+	--font-mono: "IBM Plex Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+
+	/* Codex chrome — elevated sidebar, pill items, generous radii */
+	--color-sidebar-bg:   #171717;
+	--color-hover:        #2A2A2A;
+	--radius-base:        0.75rem;
+	--radius-pill:        9999px;
+	--sidebar-item-px:    0.875rem;
+	--sidebar-item-py:    0.5rem;
+}
+
+/* ─── Theme: Antigravity (Gemini / Google-inspired) ──────────────────
+   Cool blue/purple, lighter surfaces, Inter sans. */
+[data-theme="antigravity"] {
+	--color-bg:           #0F1115;
+	--color-bg-elevated:  #161922;
+	--color-surface:      #1C2030;
+	--color-surface-hover:#252A3D;
+	--color-border:       #2A3047;
+	--color-border-soft:  #1E2333;
+	--color-fg:           #E8EAED;
+	--color-fg-muted:     #9AA0B4;
+	--color-fg-dim:       #6B7188;
+	--color-accent:       #8AB4F8;
+	--color-accent-soft:  #A8C7FA;
+	--color-accent-dim:   #4A78C9;
+
+	--font-sans: "Inter Variable", system-ui, -apple-system, Segoe UI, sans-serif;
+	--font-mono: "JetBrains Mono Variable", ui-monospace, SFMono-Regular, Menlo, monospace;
+
+	--color-sidebar-bg:   #161922;
+	--color-hover:        #252A3D;
+	--radius-base:        0.5rem;
+	--radius-pill:        9999px;
+}
+
+/* ─── Theme: Cursor (dark-first, electric accent) ────────────────────
+   Deep neutral with a vivid blue accent. Keeps Geist. */
+[data-theme="cursor"] {
+	--color-bg:           #0A0A0A;
+	--color-bg-elevated:  #111111;
+	--color-surface:      #161616;
+	--color-surface-hover:#1E1E1E;
+	--color-border:       #242424;
+	--color-border-soft:  #1A1A1A;
+	--color-fg:           #F2F2F2;
+	--color-fg-muted:     #9A9A9A;
+	--color-fg-dim:       #5F5F5F;
+	--color-accent:       #4EA1FF;
+	--color-accent-soft:  #79BBFF;
+	--color-accent-dim:   #2870C9;
+
+	--font-sans: "Geist Variable", system-ui, -apple-system, Segoe UI, sans-serif;
+	--font-mono: "Geist Mono Variable", ui-monospace, SFMono-Regular, Menlo, monospace;
+
+	--color-sidebar-bg:   #111111;
+	--color-hover:        #1E1E1E;
+	--radius-base:        0.375rem;
+}
+
+/* ─── Shared chrome helpers ──────────────────────────────────────────
+   Used by every theme that re-skins the composer/sidebar. */
+
+:root {
+	--codex-chevron: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 8'><path d='M2 2.5L6 5.5L10 2.5' fill='none' stroke='black' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'/></svg>");
+}
+
+/* ─── Codex chrome overrides ─────────────────────────────────────────
+   Scoped re-skin of the existing shell. Other themes inherit the
+   base tokens above and these rules don't fire. */
+
+[data-theme="codex"] .sidebar {
+	background-color: var(--color-sidebar-bg);
+}
+
+/* Sidebar item rows — full-width pill with hover fill */
+[data-theme="codex"] aside a[data-slug] {
+	border-radius: var(--radius-base);
+	padding: var(--sidebar-item-py) var(--sidebar-item-px);
+}
+[data-theme="codex"] aside a[data-slug]:hover {
+	background-color: var(--color-hover);
+}
+[data-theme="codex"] aside a[data-slug][aria-current="page"] {
+	background-color: var(--color-hover);
+}
+
+/* Group labels — softer, sentence case feel */
+[data-theme="codex"] details > summary {
+	text-transform: none;
+	letter-spacing: 0;
+	font-size: 13px;
+	color: var(--color-fg);
+}
+
+/* Folder icon shown only under Codex; right chevron hidden */
+.codex-folder-icon { display: none; }
+[data-theme="codex"] .codex-folder-icon { display: inline-block; }
+[data-theme="codex"] .group-chevron { display: none; }
+
+/* Date stamps on sidebar items — Codex-only.
+   The meta span (text-fg-dim) is rendered for all themes but only shown
+   under Codex. Other themes hide it so featured ★ keeps its slot. */
+html:not([data-theme="codex"]) aside a[data-slug] > span.text-fg-dim {
+	display: none;
+}
+[data-theme="codex"] aside a[data-slug] > span[aria-label="featured"] {
+	display: none;
+}
+
+/* Codex-only decorative top utility rows */
+.codex-only { display: none; }
+[data-theme="codex"] .codex-only { display: flex; }
+
+/* Tighter group spacing — Codex packs folders close */
+[data-theme="codex"] aside details {
+	margin-top: 0.5rem;
+}
+[data-theme="codex"] aside details:first-of-type {
+	margin-top: 0.25rem;
+}
+
+/* Folder labels lighter weight — match item weight closer */
+[data-theme="codex"] aside details > summary > span.font-semibold {
+	font-weight: 500;
+}
+
+/* "Threads" supra-label above the group nav */
+[data-theme="codex"] aside nav[aria-label="Posts and projects"]::before {
+	content: "Threads";
+	display: block;
+	padding: 0.75rem 0.875rem 0.25rem;
+	margin: 0 0.5rem;
+	font-size: 11px;
+	color: var(--color-fg-dim);
+	letter-spacing: 0;
+}
+
+/* "+ New post" → "+ New thread" cosmetic relabel */
+[data-theme="codex"] aside a[href="/subscribe/"] > span:not(.sr-only) {
+	font-size: 0;
+}
+[data-theme="codex"] aside a[href="/subscribe/"] > span:not(.sr-only)::before {
+	content: "New thread";
+	font-size: 14px;
+}
+
+/* + New post / Search rows — match item pill treatment */
+[data-theme="codex"] aside a[href="/subscribe/"],
+[data-theme="codex"] aside #search-trigger {
+	border-radius: var(--radius-base);
+	padding: var(--sidebar-item-py) var(--sidebar-item-px);
+}
+[data-theme="codex"] aside a[href="/subscribe/"]:hover,
+[data-theme="codex"] aside #search-trigger:hover {
+	background-color: var(--color-hover);
+}
+
+/* User card → account row */
+[data-theme="codex"] aside .border-t > div:has(> a[href="/about/"]) {
+	border-radius: var(--radius-base);
+}
+
+/* Topbar bg matches sidebar elevation */
+[data-theme="codex"] .topbar {
+	background-color: var(--color-bg);
+}
+
+/* Hide the orange bike mascot — not on brand for ChatGPT/Codex */
+[data-theme="codex"] .mascot-anchor { display: none; }
+
+/* ─── Codex composer ─────────────────────────────────────────────────
+   Visually merge the trigger and meta-row into ONE rounded box, with
+   chrome (model badge + send) sitting at the bottom-inside, matching
+   Codex's actual composer. DOM untouched — siblings styled to share
+   a continuous border. */
+
+[data-theme="codex"] #searchbar-trigger {
+	border-radius: 1.5rem 1.5rem 0 0;
+	border-bottom: none;
+	padding: 1.25rem 1.5rem 0.5rem;
+	background-color: var(--color-surface);
+	border-color: var(--color-border);
+	font-size: 15px;
+	align-items: flex-start;
+}
+[data-theme="codex"] #searchbar-trigger:hover {
+	background-color: var(--color-surface);
+	border-color: var(--color-border);
+}
+
+/* Hide the search magnifying glass under Codex — the real composer
+   has no leading icon. The first svg child is the search icon. */
+[data-theme="codex"] #searchbar-trigger > svg {
+	display: none;
+}
+
+/* Swap placeholder text "Search posts..." → "Ask Codex anything" */
+[data-theme="codex"] #searchbar-trigger > span.flex-1 {
+	font-size: 0;
+}
+[data-theme="codex"] #searchbar-trigger > span.flex-1::before {
+	content: "Ask Codex anything";
+	font-size: 15px;
+	color: var(--color-fg-dim);
+}
+
+/* Toolbar row — merge flush with trigger to form one continuous box */
+[data-theme="codex"] .search-bar > .content-col > div.flex.items-center.justify-between {
+	margin-top: 0;
+	padding: 0.625rem 1rem 0.75rem;
+	background-color: var(--color-surface);
+	border: 1px solid var(--color-border);
+	border-top: none;
+	border-radius: 0 0 1.5rem 1.5rem;
+}
+
+/* Hide +, mic, chevron — Codex shows only the model badge (left) and effort badge (right) */
+[data-theme="codex"] .search-bar .flex.items-center.gap-1 > button {
+	display: none;
+}
+
+/* (chevron SVG moved to :root above — shared across themes) */
+
+/* Auto pill → model badge ("GPT-5.5") */
+[data-theme="codex"] .search-bar .bg-yellow-500\/15 {
+	display: inline-flex;
+	align-items: center;
+	background-color: transparent;
+	color: var(--color-fg);
+	font-size: 0;
+	padding: 0.25rem 0.5rem;
+	border-radius: 0.5rem;
+	gap: 0.25rem;
+}
+[data-theme="codex"] .search-bar .bg-yellow-500\/15::before {
+	content: "GPT-5.5";
+	font-size: 13px;
+	font-weight: 600;
+	letter-spacing: 0;
+	text-transform: none;
+}
+[data-theme="codex"] .search-bar .bg-yellow-500\/15::after {
+	content: "";
+	display: inline-block;
+	width: 10px;
+	height: 7px;
+	margin-left: 4px;
+	background-color: currentColor;
+	-webkit-mask: var(--codex-chevron) no-repeat center / contain;
+	mask: var(--codex-chevron) no-repeat center / contain;
+}
+[data-theme="codex"] .search-bar .bg-yellow-500\/15:hover {
+	background-color: var(--color-hover);
+}
+
+/* Right cluster — keep visible but strip Claude-specific bits */
+[data-theme="codex"] .search-bar .group .usage-popover,
+[data-theme="codex"] .search-bar .group svg {
+	display: none;
+}
+[data-theme="codex"] .search-bar .group .whitespace-nowrap {
+	display: inline-flex;
+	align-items: center;
+	font-size: 0;
+}
+[data-theme="codex"] .search-bar .group .whitespace-nowrap::before {
+	content: "Medium";
+	font-size: 13px;
+	font-weight: 500;
+	color: var(--color-fg);
+}
+[data-theme="codex"] .search-bar .group .whitespace-nowrap::after {
+	content: "";
+	display: inline-block;
+	width: 10px;
+	height: 7px;
+	margin-left: 4px;
+	background-color: var(--color-fg);
+	-webkit-mask: var(--codex-chevron) no-repeat center / contain;
+	mask: var(--codex-chevron) no-repeat center / contain;
+}
+
+/* Codex-style send button — circular white with dark arrow */
+[data-theme="codex"] .search-bar .flex.items-center.justify-between::after {
+	content: "↑";
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	width: 30px;
+	height: 30px;
+	border-radius: 9999px;
+	background-color: var(--color-fg);
+	color: var(--color-bg);
+	font-size: 16px;
+	font-weight: 700;
+	line-height: 1;
+	margin-left: auto;
+}
+
+/* ─── Antigravity (Google's agentic IDE) chrome ───────────────────────
+   Merged composer with chrome inside, "Gemini 3.5 Flash" model badge,
+   mic-only right side, "Projects" sidebar supra-label. */
+
+[data-theme="antigravity"] .sidebar {
+	background-color: var(--color-sidebar-bg);
+}
+[data-theme="antigravity"] aside a[data-slug] {
+	border-radius: var(--radius-base);
+	padding: 0.375rem 0.75rem;
+	font-size: 13px;
+}
+[data-theme="antigravity"] aside a[data-slug]:hover,
+[data-theme="antigravity"] aside a[data-slug][aria-current="page"] {
+	background-color: var(--color-hover);
+}
+[data-theme="antigravity"] aside a[href="/subscribe/"],
+[data-theme="antigravity"] aside #search-trigger {
+	border-radius: var(--radius-base);
+	padding: 0.375rem 0.75rem;
+	font-size: 13px;
+}
+[data-theme="antigravity"] aside a[href="/subscribe/"]:hover,
+[data-theme="antigravity"] aside #search-trigger:hover {
+	background-color: var(--color-hover);
+}
+
+/* Group labels — softer */
+[data-theme="antigravity"] details > summary {
+	text-transform: none;
+	letter-spacing: 0;
+	font-size: 12px;
+	color: var(--color-fg-muted);
+}
+[data-theme="antigravity"] aside nav[aria-label="Posts and projects"]::before {
+	content: "Projects";
+	display: block;
+	padding: 0.75rem 0.875rem 0.25rem;
+	margin: 0 0.5rem;
+	font-size: 12px;
+	color: var(--color-fg-muted);
+	letter-spacing: 0;
+}
+
+/* "+ New post" → "+ New Conversation" */
+[data-theme="antigravity"] aside a[href="/subscribe/"] > span:not(.sr-only) {
+	font-size: 0;
+}
+[data-theme="antigravity"] aside a[href="/subscribe/"] > span:not(.sr-only)::before {
+	content: "New Conversation";
+	font-size: 13px;
+}
+
+/* Hide mascot */
+[data-theme="antigravity"] .mascot-anchor { display: none; }
+
+/* Composer — merged trigger+toolbar (Antigravity style) */
+[data-theme="antigravity"] #searchbar-trigger {
+	border-radius: 0.75rem 0.75rem 0 0;
+	border-bottom: none;
+	padding: 1rem 1.25rem 0.5rem;
+	background-color: var(--color-surface);
+	border-color: var(--color-border);
+	font-size: 14px;
+	align-items: flex-start;
+}
+[data-theme="antigravity"] #searchbar-trigger:hover {
+	background-color: var(--color-surface);
+	border-color: var(--color-border);
+}
+[data-theme="antigravity"] #searchbar-trigger > svg {
+	display: none;
+}
+[data-theme="antigravity"] #searchbar-trigger > span.flex-1 {
+	font-size: 0;
+}
+[data-theme="antigravity"] #searchbar-trigger > span.flex-1::before {
+	content: "Ask anything, @ to mention, / for actions";
+	font-size: 14px;
+	color: var(--color-fg-dim);
+}
+
+/* Toolbar — merge flush with trigger, one continuous box */
+[data-theme="antigravity"] .search-bar > .content-col > div.flex.items-center.justify-between {
+	margin-top: 0;
+	padding: 0.5rem 0.75rem 0.625rem;
+	background-color: var(--color-surface);
+	border: 1px solid var(--color-border);
+	border-top: none;
+	border-radius: 0 0 0.75rem 0.75rem;
+}
+
+/* Show only the + button (nth-child 2); hide Auto pill, mic, chevron */
+[data-theme="antigravity"] .search-bar .flex.items-center.gap-1 > button {
+	display: none;
+}
+[data-theme="antigravity"] .search-bar .flex.items-center.gap-1 > button:nth-child(2) {
+	display: inline-flex;
+	color: var(--color-fg-muted);
+}
+
+/* Left model badge → "Gemini 3.5 Flash (High) ⌄" */
+[data-theme="antigravity"] .search-bar .bg-yellow-500\/15 {
+	display: inline-flex;
+	align-items: center;
+	background-color: transparent;
+	color: var(--color-fg);
+	font-size: 0;
+	padding: 0.25rem 0.5rem;
+	border-radius: 0.375rem;
+	order: 2;
+}
+[data-theme="antigravity"] .search-bar .bg-yellow-500\/15::before {
+	content: "Gemini 3.5 Flash (High)";
+	font-size: 13px;
+	font-weight: 500;
+	letter-spacing: 0;
+	text-transform: none;
+}
+[data-theme="antigravity"] .search-bar .bg-yellow-500\/15::after {
+	content: "";
+	display: inline-block;
+	width: 10px;
+	height: 7px;
+	margin-left: 4px;
+	background-color: currentColor;
+	-webkit-mask: var(--codex-chevron) no-repeat center / contain;
+	mask: var(--codex-chevron) no-repeat center / contain;
+}
+[data-theme="antigravity"] .search-bar .bg-yellow-500\/15:hover {
+	background-color: var(--color-hover);
+}
+
+/* Right cluster — hide entirely (no model name on right under Antigravity) */
+[data-theme="antigravity"] .search-bar .group {
+	display: none;
+}
+
+/* Send arrow → circular mic icon button (no send) */
+[data-theme="antigravity"] .search-bar .flex.items-center.justify-between::after {
+	content: "";
+	display: inline-flex;
+	width: 28px;
+	height: 28px;
+	margin-left: auto;
+	border-radius: 9999px;
+	background-color: transparent;
+	color: var(--color-fg-muted);
+	background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%239AA0B4'><path d='M12 14a3 3 0 0 0 3-3V6a3 3 0 0 0-6 0v5a3 3 0 0 0 3 3zM19 11a1 1 0 0 0-2 0 5 5 0 0 1-10 0 1 1 0 0 0-2 0 7 7 0 0 0 6 6.92V20h-3a1 1 0 0 0 0 2h8a1 1 0 0 0 0-2h-3v-2.08A7 7 0 0 0 19 11z'/></svg>");
+	background-repeat: no-repeat;
+	background-position: center;
+	background-size: 18px 18px;
+}
+
+/* ─── Cursor (Antigravity-IDE inspired) chrome ───────────────────────
+   Compact composer with + on left, "Auto ⌄" + mic circle on right.
+   Sidebar has Repositories supra-label and Ctrl+N hint. */
+
+[data-theme="cursor"] .sidebar {
+	background-color: var(--color-sidebar-bg);
+}
+[data-theme="cursor"] aside a[data-slug] {
+	border-radius: var(--radius-base);
+	padding: 0.25rem 0.75rem;
+	font-size: 13px;
+}
+[data-theme="cursor"] aside a[data-slug]:hover,
+[data-theme="cursor"] aside a[data-slug][aria-current="page"] {
+	background-color: var(--color-hover);
+}
+[data-theme="cursor"] aside a[href="/subscribe/"],
+[data-theme="cursor"] aside #search-trigger {
+	border-radius: var(--radius-base);
+	padding: 0.375rem 0.75rem;
+	font-size: 13px;
+}
+
+/* Group labels — code-IDE feel, tighter */
+[data-theme="cursor"] details > summary {
+	text-transform: none;
+	letter-spacing: 0;
+	font-size: 11px;
+	color: var(--color-fg-dim);
+	font-weight: 500;
+}
+
+/* "Repositories" supra-label above the group nav */
+[data-theme="cursor"] aside nav[aria-label="Posts and projects"]::before {
+	content: "Repositories";
+	display: block;
+	padding: 0.75rem 0.875rem 0.25rem;
+	margin: 0 0.5rem;
+	font-size: 11px;
+	color: var(--color-fg-dim);
+	letter-spacing: 0;
+}
+
+/* "+ New post" → "+ New Agent" with Ctrl+N hint */
+[data-theme="cursor"] aside a[href="/subscribe/"] > span:not(.sr-only) {
+	font-size: 0;
+	flex: 1;
+}
+[data-theme="cursor"] aside a[href="/subscribe/"] > span:not(.sr-only)::before {
+	content: "New Agent";
+	font-size: 13px;
+}
+/* Hide mascot */
+[data-theme="cursor"] .mascot-anchor { display: none; }
+
+/* Composer — IDE-style rounded rectangle */
+[data-theme="cursor"] #searchbar-trigger {
+	border-radius: 0.5rem;
+	padding: 0.875rem 1rem;
+	background-color: var(--color-bg-elevated);
+	border-color: var(--color-border);
+	font-size: 14px;
+}
+[data-theme="cursor"] #searchbar-trigger:hover {
+	background-color: var(--color-surface);
+}
+[data-theme="cursor"] #searchbar-trigger > svg {
+	display: none;
+}
+[data-theme="cursor"] #searchbar-trigger > span.flex-1 {
+	font-size: 0;
+}
+[data-theme="cursor"] #searchbar-trigger > span.flex-1::before {
+	content: "Send follow-up";
+	font-size: 14px;
+	color: var(--color-fg-dim);
+}
+
+/* Toolbar — slimmer, snug under composer */
+[data-theme="cursor"] .search-bar > .content-col > div.flex.items-center.justify-between {
+	margin-top: 0.5rem;
+	padding: 0 0.5rem;
+}
+
+/* Hide model badge on left — + button replaces it */
+[data-theme="cursor"] .search-bar .bg-yellow-500\/15 {
+	display: none;
+}
+
+/* Show only the + button (nth-child 2); hide Auto pill (1), mic (3), chevron (4) */
+[data-theme="cursor"] .search-bar .flex.items-center.gap-1 > button {
+	display: none;
+}
+[data-theme="cursor"] .search-bar .flex.items-center.gap-1 > button:nth-child(2) {
+	display: inline-flex;
+	color: var(--color-fg-muted);
+}
+
+/* Right cluster — "Auto ⌄" model badge */
+[data-theme="cursor"] .search-bar .group .usage-popover,
+[data-theme="cursor"] .search-bar .group svg {
+	display: none;
+}
+[data-theme="cursor"] .search-bar .group .whitespace-nowrap {
+	display: inline-flex;
+	align-items: center;
+	font-size: 0;
+}
+[data-theme="cursor"] .search-bar .group .whitespace-nowrap::before {
+	content: "Auto";
+	font-size: 13px;
+	font-weight: 500;
+	color: var(--color-fg-muted);
+}
+[data-theme="cursor"] .search-bar .group .whitespace-nowrap::after {
+	content: "";
+	display: inline-block;
+	width: 10px;
+	height: 7px;
+	margin-left: 4px;
+	background-color: var(--color-fg-muted);
+	-webkit-mask: var(--codex-chevron) no-repeat center / contain;
+	mask: var(--codex-chevron) no-repeat center / contain;
+}
+
+/* Send arrow → circular mic icon button */
+[data-theme="cursor"] .search-bar .flex.items-center.justify-between::after {
+	content: "";
+	display: inline-flex;
+	width: 28px;
+	height: 28px;
+	margin-left: 0.625rem;
+	border-radius: 9999px;
+	background-color: var(--color-surface);
+	border: 1px solid var(--color-border);
+	-webkit-mask: none;
+	mask: none;
+	color: var(--color-fg);
+	background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23f2f2f2'><path d='M12 14a3 3 0 0 0 3-3V6a3 3 0 0 0-6 0v5a3 3 0 0 0 3 3zM19 11a1 1 0 0 0-2 0 5 5 0 0 1-10 0 1 1 0 0 0-2 0 7 7 0 0 0 6 6.92V20h-3a1 1 0 0 0 0 2h8a1 1 0 0 0 0-2h-3v-2.08A7 7 0 0 0 19 11z'/></svg>");
+	background-repeat: no-repeat;
+	background-position: center;
+	background-size: 16px 16px;
+}
+
 
 /* Base reset */
 *,
@@ -44,6 +670,7 @@ html {
 	-webkit-font-smoothing: antialiased;
 	-moz-osx-font-smoothing: grayscale;
 	color-scheme: dark;
+	transition: background-color 200ms ease, color 200ms ease;
 }
 
 body {
@@ -51,7 +678,7 @@ body {
 	min-height: 100vh;
 }
 
-/* Scrollbar — subtle, matches the dark palette */
+/* Scrollbar — subtle, picks up theme tokens */
 ::-webkit-scrollbar {
 	width: 10px;
 	height: 10px;
