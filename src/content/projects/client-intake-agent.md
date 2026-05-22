@@ -1,7 +1,7 @@
 ---
-title: Conversational AI Client-Intake Agent
-description: A hybrid-conversational AI agent that replaces manual pre-engagement client intake.
-pubDate: 2026-05-05
+title: 'Discovery Agent: production-grade AI intake, with the brief as the contract'
+description: A hybrid-conversational AI intake agent for consulting engagements. The brief is the contract; the architecture is the operator judgment.
+pubDate: 2026-05-21
 tags:
   - ai-agent
   - llm
@@ -11,6 +11,8 @@ tags:
   - building-in-public
   - ai-augmented
   - claude-code
+  - production-ai
+  - eval-driven-development
   - nextjs
   - typescript
   - tailwind
@@ -40,11 +42,32 @@ skills:
 
 ## What
 
-A hybrid-conversational AI agent for pre-engagement client intake. Inbound clients receive a magic link, walk through a guided multi-session intake, and the engagement team receives a structured discovery brief by email when everyone has finished.
+A hybrid-conversational AI agent — scripted spine, AI on the follow-ups — for pre-engagement client intake. Inbound clients receive a magic link, walk through a guided multi-session intake, and the engagement team receives a structured discovery brief by email when the intake completes.
 
-## Why
+## Why I'm building it
 
-Pre-engagement intake is the single most expensive thing a service business does badly. Static questionnaires don't probe; humans who probe in person don't scale; the cost gets paid in either lost revenue or unbillable scoping calls. A conversational agent that can pull on threads and produce a brief in the team's own shape removes a large amount of manual ceremony without putting any actual decisions in the agent's hands.
+I've spent 10+ years on the consulting side of CRM implementations. The pre-discovery questionnaire — a Word doc emailed to a paying client — is the single most expensive thing services firms do badly. Most clients return it incomplete, late, or with answers that don't match what we actually need to walk into the discovery call prepared. The job has never been to collect data. It's been to show up already knowing the three things that matter. That's a conversation, not a form. So I'm building the conversation, and treating the brief as the deliverable.
+
+## What makes this different
+
+This is not a chatbot wrapped around an LLM. The architecture treats the discovery brief as a contract document: every part of the system exists to produce a brief consultants actually want to read. The constraints baked into the build are where ten years of intake judgment lives.
+
+- **The brief is the product.** Brief schema is a contract doc. Every agent in the build coordinates through it. Schema changes route through a single owner with eval discipline.
+- **Server-authoritative session state.** Magic-link token validates server-side on every request. No PII in URLs. The client never decides what's complete.
+- **System prompt is invisible and eval-gated.** Any commit touching the prompt requires a passing eval-set run. No silent drift in agent behavior.
+- **User input is data, never instruction.** Injection attempts get a polite decline, a timestamped log, and a flag in the brief's Security Note section.
+- **AI disclosure is mandatory.** Consent timestamp recorded server-side; no agent turn fires for a session that lacks it.
+- **ZDR-tier model endpoint, enforced architecturally.** Anthropic Zero-Data-Retention required by hard rule. The disclosure copy commits to "never used for training"; the architecture is the implementation contract.
+- **Brand-agnostic by rule.** All firm-identity strings — name, color, logo path, domain, retention period — flow through a single config. The same codebase serves any firm.
+- **5-layer smoke pipeline.** Unit → integration → conversation eval (Claude judge against a golden set) → Playwright E2E → human visual regression. The agent runs layers 1–4 before requesting human review.
+
+There are 27 architectural rules of this shape in the project's CLAUDE.md. None of them are incidental.
+
+## How it's built
+
+A four-agent governance harness — PM, frontend, backend, and agent-prompt — each with bounded ownership. PM owns governance docs (DECISIONS, PROGRESS, COMPLETION_LOG); agent-prompt owns the system prompt and brief schema; the engineering agents touch code only in their lanes. Schema changes propagate via `// CONTRACT-CHANGE-NEEDED:` comments that PM picks up at every `/wrap` and routes.
+
+The 27 hard rules and the governance docs are append-only — corrections add a new entry rather than rewriting history. Cross-territory changes (anything touching `config/brand.ts`, the system prompt, the brief schema, or any DB migration) trigger an `AskUserQuestion` grill before any code is written, regardless of which agent surfaced the change.
 
 ## Stack at a glance
 
@@ -56,7 +79,3 @@ Pre-engagement intake is the single most expensive thing a service business does
 - **[Vitest](https://vitest.dev) + [Playwright](https://playwright.dev)** — unit and end-to-end coverage
 - **[Lefthook](https://github.com/evilmartians/lefthook) + [Biome](https://biomejs.dev)** — pre-commit gates and formatter
 - **Hosted on [Vercel](https://vercel.com)**
-
-## How it's built
-
-A four-agent governance harness — PM, backend, frontend, trust-ops — with a hard-rule set focused on security posture: server-authoritative session state, no PII in URLs, no in-chat brief rendering, an invisible system prompt, user input treated as data and never as instruction, ZDR-tier required on the model endpoint. All firm-identity strings flow through a single brand config so the same codebase can be re-skinned cleanly.
