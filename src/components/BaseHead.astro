@@ -24,6 +24,25 @@ const fullTitle = title === SITE_TITLE ? title : `${title} — ${SITE_TITLE}`;
 <meta name="generator" content={Astro.generator} />
 <link rel="canonical" href={canonicalURL} />
 
+<!-- Theme bootstrap: set data-theme before paint to avoid flash.
+     Runs on every navigation (incl. ClientRouter view transitions). -->
+<script is:inline>
+	(function () {
+		var THEMES = ['claude', 'codex', 'antigravity', 'cursor'];
+		function apply() {
+			try {
+				var t = localStorage.getItem('theme');
+				if (!t || THEMES.indexOf(t) === -1) t = 'claude';
+				document.documentElement.setAttribute('data-theme', t);
+			} catch (e) {
+				document.documentElement.setAttribute('data-theme', 'claude');
+			}
+		}
+		apply();
+		document.addEventListener('astro:after-swap', apply);
+	})();
+</script>
+
 <!-- Theme color matches the bg so URL bar blends in on mobile -->
 <meta name="theme-color" content="#1A1A1A" />
 <meta name="color-scheme" content="dark" />
