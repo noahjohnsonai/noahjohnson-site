@@ -27,6 +27,7 @@ interface Props {
 	showProgress?: boolean; // render the scroll-progress tick timeline (default true)
 	dateFormat?: 'full' | 'month-year'; // 'month-year' default — calendar-day on posts/case-studies is too precise
 	minimalHeader?: boolean; // hide visible description + meta row (date, read time, tags). SEO description still emitted.
+	showReadTime?: boolean; // show "X min read" in the meta row (default true)
 }
 const {
 	title,
@@ -44,6 +45,7 @@ const {
 	showProgress = true,
 	dateFormat = 'month-year',
 	minimalHeader = false,
+	showReadTime = true,
 } = Astro.props;
 
 const readMinutes = rawMarkdown ? readingTimeMinutes(rawMarkdown) : 0;
@@ -101,7 +103,7 @@ const breadcrumbs =
 						<span>updated <time datetime={updatedDate.toISOString()}>{fmt(updatedDate)}</time></span>
 					</>
 				)}
-				{readMinutes > 0 && (
+				{showReadTime && readMinutes > 0 && (
 					<>
 						<span>•</span>
 						<span>{readMinutes} min read</span>
