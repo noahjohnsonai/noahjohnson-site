@@ -1,11 +1,13 @@
 ---
 import { AUTHOR, SITE_DESCRIPTION } from '../consts.ts';
-import Spark from './Spark.astro';
 ---
 
 <section class="welcome-hero px-2 sm:px-4 pt-8 pb-6">
 	<div class="flex items-center gap-3 mb-3">
-		<Spark size={28} class="text-accent shrink-0" />
+		<img src="/brands/claude.svg"      alt="" width="28" height="28" class="hero-mark hero-mark-claude shrink-0" />
+		<img src="/brands/codex.svg"       alt="" width="28" height="28" class="hero-mark hero-mark-codex shrink-0" />
+		<img src="/brands/antigravity.svg" alt="" width="28" height="28" class="hero-mark hero-mark-antigravity shrink-0" />
+		<img src="/brands/cursor.svg"      alt="" width="28" height="28" class="hero-mark hero-mark-cursor shrink-0" />
 		<h1 class="text-2xl sm:text-3xl font-medium text-fg m-0 leading-tight">
 			Welcome back, {AUTHOR.split(' ')[0]}
 		</h1>
@@ -14,3 +16,15 @@ import Spark from './Spark.astro';
 		{SITE_DESCRIPTION}
 	</p>
 </section>
+
+<style is:global>
+	/* Show only the mark that matches the active theme */
+	.hero-mark { display: none; }
+	[data-theme="claude"]      .hero-mark-claude,
+	:root:not([data-theme])    .hero-mark-claude,
+	[data-theme="codex"]       .hero-mark-codex,
+	[data-theme="antigravity"] .hero-mark-antigravity,
+	[data-theme="cursor"]      .hero-mark-cursor {
+		display: inline-block;
+	}
+</style>
