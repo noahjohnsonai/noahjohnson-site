@@ -156,13 +156,9 @@
 [data-theme="codex"] .codex-folder-icon { display: inline-block; }
 [data-theme="codex"] .group-chevron { display: none; }
 
-/* Date stamps on sidebar items — Codex-only.
-   The meta span (text-fg-dim) is rendered for all themes but only shown
-   under Codex. Other themes hide it so featured ★ keeps its slot. */
-html:not([data-theme="codex"]) aside a[data-slug] > span.text-fg-dim {
-	display: none;
-}
-[data-theme="codex"] aside a[data-slug] > span[aria-label="featured"] {
+/* Date stamps hidden in all themes — the meta span renders for the
+   data model but isn't shown in any sidebar treatment. */
+aside a[data-slug] > span.text-fg-dim {
 	display: none;
 }
 
