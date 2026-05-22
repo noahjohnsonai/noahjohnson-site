@@ -2,7 +2,7 @@
 
 export const SITE_TITLE = 'Noah Johnson';
 export const SITE_DESCRIPTION =
-	'AI-augmented engineering, methodology, and case studies.';
+	'Field notes from the seam between operations leadership and AI engineering.';
 export const SITE_URL = 'https://www.noahjohnson.ai/';
 export const AUTHOR = 'Noah Johnson';
 export const AUTHOR_INITIALS = 'NJ';
