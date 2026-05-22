@@ -3,6 +3,10 @@ title: About
 description: A bit about me and this blog.
 ---
 
-I'm Noah Johnson. This site is where I write about AI-augmented engineering — how working with capable models actually changes throughput, methodology, and the shape of the work, with case studies from real projects.
+I build with AI. My day job is running RevOps at a consulting firm.
 
-More about me is on the way. In the meantime, you can find me on [GitHub](https://github.com/noahjohnsonai) or reach out via [email](mailto:noah@noahjohnson.ai).
+Mostly through Claude Code — full-stack projects, agents, the things on this site. I work the seam between operations and AI engineering. It's the lens I work from.
+
+What I'm thinking about right now: how agentic tooling actually changes operations work, how Claude Code reshapes services-firm economics, and the operator/builder hybrid as a role shape that didn't exist five years ago. Case studies and project notes on this site are the evidence as I figure it out.
+
+Find me on [GitHub](https://github.com/noahjohnsonai), [LinkedIn](https://www.linkedin.com/in/connectwithnoah/), or by [email](mailto:noah@noahjohnson.ai).
