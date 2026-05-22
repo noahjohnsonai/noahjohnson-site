@@ -8,4 +8,5 @@ export const AUTHOR = 'Noah Johnson';
 export const AUTHOR_INITIALS = 'NJ';
 export const AUTHOR_DOMAIN = 'noahjohnson.ai';
 export const AUTHOR_GITHUB = 'https://github.com/noahjohnsonai';
+export const AUTHOR_LINKEDIN = 'https://www.linkedin.com/in/connectwithnoah/';
 export const AUTHOR_EMAIL = 'noah@noahjohnson.ai';
